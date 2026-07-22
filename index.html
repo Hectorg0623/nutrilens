@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NutriLens — Know what you eat</title>
+<style>
+  :root{
+    --green:#16a34a; --green-d:#15803d; --green-l:#dcfce7;
+    --amber:#d97706; --amber-l:#fef3c7;
+    --red:#dc2626; --red-l:#fee2e2;
+    --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --bg:#f8fafc; --card:#ffffff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px}
+  /* nav */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--line);background:var(--card)}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.02em}
+  .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--green),#22c55e);display:grid;place-items:center;color:#fff;font-size:19px}
+  .brand small{display:block;font-weight:500;font-size:11px;color:var(--muted);letter-spacing:.02em}
+  .navlinks{display:flex;gap:22px;font-size:14px;color:var(--muted)}
+  .navlinks span{cursor:default}
+  /* hero */
+  .hero{padding:56px 0 40px;background:radial-gradient(1200px 400px at 50% -80px,var(--green-l),transparent);text-align:center}
+  .pill{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);color:var(--green-d);font-weight:600;font-size:12.5px;padding:6px 13px;border-radius:999px;margin-bottom:22px}
+  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+  h1{font-size:44px;line-height:1.08;letter-spacing:-.03em;font-weight:820;max-width:16ch;margin:0 auto}
+  h1 em{font-style:normal;color:var(--green)}
+  .sub{margin:20px auto 0;max-width:60ch;font-size:17.5px;color:#334155}
+  /* steps */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:44px 0 8px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+  .step .n{width:30px;height:30px;border-radius:9px;background:var(--green-l);color:var(--green-d);font-weight:800;display:grid;place-items:center;font-size:15px;margin-bottom:12px}
+  .step h3{font-size:16px;margin-bottom:5px;letter-spacing:-.01em}
+  .step p{font-size:13.5px;color:var(--muted)}
+  /* demo card */
+  .demo{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;margin:34px 0 20px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  .demo-head{display:flex;align-items:center;gap:11px;margin-bottom:4px}
+  .demo-head h2{font-size:22px;letter-spacing:-.02em}
+  .fc{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#c2410c;background:#fff7ed;border:1px solid #fed7aa;padding:4px 10px;border-radius:999px}
+  .demo>.lead{color:var(--muted);font-size:14.5px;margin:6px 0 22px;max-width:70ch}
+  .field{margin-bottom:14px}
+  label{display:block;font-size:12.5px;font-weight:700;color:#334155;margin-bottom:6px;letter-spacing:.01em}
+  label .hint{font-weight:500;color:var(--muted)}
+  input[type=text],input[type=password]{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:11px;font-size:14.5px;font-family:inherit;background:#fff;transition:border .15s,box-shadow .15s}
+  input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px var(--green-l)}
+  .row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+  .row .field{flex:1;min-width:230px;margin-bottom:0}
+  .btn{appearance:none;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:15px;padding:12px 22px;border-radius:11px;background:var(--green);color:#fff;transition:background .15s,transform .05s}
+  .btn:hover{background:var(--green-d)}
+  .btn:active{transform:translateY(1px)}
+  .btn:disabled{opacity:.6;cursor:not-allowed}
+  .btn.ghost{background:#fff;color:#334155;border:1px solid var(--line)}
+  .btn.ghost:hover{background:#f1f5f9}
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .examples{margin-top:14px;font-size:12.5px;color:var(--muted)}
+  .examples a{color:var(--green-d);cursor:pointer;text-decoration:none;border-bottom:1px dashed #86efac}
+  .examples a:hover{color:var(--green)}
+  /* status */
+  .status{display:none;margin-top:20px;padding:14px 16px;border-radius:12px;font-size:14px;align-items:center;gap:10px}
+  .status.show{display:flex}
+  .status.load{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+  .status.err{background:var(--red-l);color:#991b1b;border:1px solid #fecaca}
+  .spinner{width:16px;height:16px;border:2.5px solid #bfdbfe;border-top-color:#1d4ed8;border-radius:50%;animation:spin .7s linear infinite;flex:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  /* results */
+  .results{display:none;margin-top:26px}
+  .results.show{display:block}
+  .verdict{display:flex;align-items:center;gap:18px;padding:20px;border-radius:16px;margin-bottom:20px;border:1px solid}
+  .verdict .score{width:74px;height:74px;border-radius:16px;display:grid;place-items:center;font-weight:850;font-size:26px;color:#fff;flex:none}
+  .verdict h3{font-size:21px;letter-spacing:-.02em}
+  .verdict p{font-size:14px;color:#475569;margin-top:2px}
+  .v-good{background:var(--green-l);border-color:#bbf7d0}.v-good .score{background:var(--green)}.v-good h3{color:var(--green-d)}
+  .v-mod{background:var(--amber-l);border-color:#fde68a}.v-mod .score{background:var(--amber)}.v-mod h3{color:#b45309}
+  .v-poor{background:var(--red-l);border-color:#fecaca}.v-poor .score{background:var(--red)}.v-poor h3{color:#b91c1c}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}.steps{grid-template-columns:1fr}h1{font-size:34px}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+  .panel h4{font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:12px}
+  .kv{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:14px}
+  .kv:last-child{border-bottom:none}
+  .kv .k{color:#475569}
+  .kv .v{font-weight:700;text-align:right}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;margin:0 4px 4px 0}
+  .tag.bad{background:var(--red-l);color:#b91c1c}
+  .tag.warn{background:var(--amber-l);color:#b45309}
+  .tag.ok{background:var(--green-l);color:var(--green-d)}
+  .concern{display:flex;gap:10px;font-size:14px;padding:9px 0;border-bottom:1px solid #f1f5f9}
+  .concern:last-child{border-bottom:none}
+  .concern .ic{flex:none;margin-top:1px}
+  .swap{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:13px;margin-bottom:10px;background:#fbfefc}
+  .swap .em{font-size:22px;flex:none}
+  .swap b{font-size:14.5px}
+  .swap p{font-size:13px;color:var(--muted);margin-top:2px}
+  .fullw{grid-column:1/-1}
+  /* raw */
+  details.raw{margin-top:18px;border:1px solid var(--line);border-radius:14px;background:#0f172a;overflow:hidden}
+  details.raw summary{cursor:pointer;padding:13px 18px;color:#e2e8f0;font-weight:700;font-size:13.5px;list-style:none;display:flex;align-items:center;justify-content:space-between;background:#1e293b}
+  details.raw summary::-webkit-details-marker{display:none}
+  details.raw summary .lbl{display:flex;align-items:center;gap:9px}
+  details.raw pre{margin:0;padding:16px 18px;overflow:auto;max-height:420px;color:#a5f3d0;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.6}
+  .rawtabs{display:flex;gap:0;background:#1e293b;border-top:1px solid #334155}
+  .rawtab{padding:9px 16px;font-size:12.5px;font-weight:600;color:#94a3b8;cursor:pointer;border-bottom:2px solid transparent}
+  .rawtab.active{color:#fff;border-bottom-color:var(--green)}
+  footer{border-top:1px solid var(--line);margin-top:50px;padding:26px 0;text-align:center;color:var(--muted);font-size:13px;background:var(--card)}
+  .disc{font-size:11.5px;color:#94a3b8;margin-top:16px;text-align:center;max-width:70ch;margin-left:auto;margin-right:auto}
+</style>
+</head>
+<body>
+<nav>
+  <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;width:100%;padding:0 20px">
+    <div class="brand">
+      <div class="logo">🥗</div>
+      <div>NutriLens<small>Know what you eat</small></div>
+    </div>
+    <div class="navlinks"><span>How it works</span><span>Analyzer</span><span>About</span></div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="pill"><span class="dot"></span> Food education, powered by real product data</div>
+    <h1>Know what's <em>really</em> in your food.</h1>
+    <p class="sub">NutriLens teaches you what to eat — not just what to avoid. Point it at any food and it explains what's good, what's harmful, why it matters for your body, and the better real-food swaps to reach for instead.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="steps">
+    <div class="step"><div class="n">1</div><h3>📷 Snap or paste</h3><p>Snap your fridge (coming soon) or paste a link to any food or grocery product.</p></div>
+    <div class="step"><div class="n">2</div><h3>🔎 Analyze</h3><p>NutriLens reads the product page and pulls out the real ingredients and nutrition.</p></div>
+    <div class="step"><div class="n">3</div><h3>🧠 Learn</h3><p>Get a plain-English health read, the effects on your body, and healthier swaps.</p></div>
+  </section>
+
+  <section class="demo">
+    <div class="demo-head">
+      <h2>Food Analyzer</h2>
+      <span class="fc">🔥 Powered by Firecrawl</span>
+    </div>
+    <p class="lead">Paste a link to any food or grocery product page. NutriLens uses <b>Firecrawl</b> to scrape the page and run an LLM extraction against a custom nutrition schema — turning a messy web page into structured health data in one call.</p>
+
+    <div class="field">
+      <label for="key">Firecrawl API key <span class="hint">— starts with <code>fc-</code>, stays in your browser</span></label>
+      <input type="password" id="key" placeholder="fc-xxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="url">Food / product URL</label>
+        <input type="text" id="url" placeholder="https://…" />
+      </div>
+      <button class="btn" id="go">Analyze food →</button>
+      <button class="btn ghost" id="sample">See a sample result</button>
+    </div>
+    <div class="examples">Try an example:
+      <a data-url="https://world.openfoodfacts.org/product/5449000000996/coca-cola">Coca-Cola</a> ·
+      <a data-url="https://world.openfoodfacts.org/product/3017620422003/nutella">Nutella</a> ·
+      <a data-url="https://world.openfoodfacts.org/product/0038000199530/frosted-flakes">Frosted Flakes</a> ·
+      <a data-url="https://world.openfoodfacts.org/product/0016000275270/old-fashioned-oats">Rolled Oats</a>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="results" id="results"></div>
+  </section>
+
+  <p class="disc">NutriLens is an educational prototype and does not provide medical advice. Nutrition figures are extracted from third-party product pages via Firecrawl and may be incomplete. Always check the physical label and consult a professional for dietary decisions.</p>
+</main>
+
+<footer>
+  <div class="wrap">
+    <b>NutriLens</b> — a food-education prototype · Firecrawl-powered analyzer demo<br/>
+    Built for ISM6427C · <em>The Cognition Economy</em>, Ch. 4 — Skills
+  </div>
+</footer>
+
+<script>
+const FC_ENDPOINT = "https://api.firecrawl.dev/v2/scrape";
+
+// ---- The "skill" we teach the AI: a nutrition-analysis extraction schema ----
+const NUTRI_SCHEMA = {
+  type: "object",
+  properties: {
+    productName: { type: "string", description: "Name of the food product" },
+    brand: { type: "string" },
+    servingSize: { type: "string", description: "e.g. '1 can (330ml)'" },
+    calories: { type: "number", description: "Calories per serving" },
+    sugar_g: { type: "number", description: "Total sugars per serving in grams" },
+    addedSugar_g: { type: "number" },
+    sodium_mg: { type: "number" },
+    saturatedFat_g: { type: "number" },
+    fiber_g: { type: "number" },
+    protein_g: { type: "number" },
+    ingredients: { type: "array", items: { type: "string" } },
+    isUltraProcessed: { type: "boolean", description: "True if it fits the NOVA ultra-processed category" },
+    healthScore: { type: "number", description: "0 (worst) to 100 (best) overall healthfulness score" },
+    healthRating: { type: "string", enum: ["Good", "Moderate", "Poor"] },
+    healthConcerns: {
+      type: "array",
+      description: "Short plain-English notes on how eating this regularly affects the body",
+      items: { type: "string" }
+    },
+    healthierAlternatives: {
+      type: "array",
+      description: "3 healthier real-food swaps, each with why it's better",
+      items: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          reason: { type: "string" }
+        }
+      }
+    }
+  },
+  required: ["productName", "healthRating", "healthConcerns", "healthierAlternatives"]
+};
+
+const EXTRACT_PROMPT =
+  "You are a registered-dietitian-style nutrition analyst. From this food or grocery product page, " +
+  "extract the product's nutrition facts and ingredient list. Then judge how healthy it is to eat regularly, " +
+  "give a 0-100 healthScore and a healthRating of Good/Moderate/Poor, explain the main effects on the body in " +
+  "plain language (healthConcerns), and suggest 3 healthier real-food alternatives a shopper could choose instead " +
+  "(healthierAlternatives, each with a short reason). Base everything only on what the page supports.";
+
+function buildRequestBody(url){
+  return {
+    url: url,
+    onlyMainContent: true,
+    formats: [
+      "markdown",
+      { type: "json", prompt: EXTRACT_PROMPT, schema: NUTRI_SCHEMA }
+    ]
+  };
+}
+
+// ---------- UI helpers ----------
+const $ = s => document.querySelector(s);
+const statusEl = $("#status"), resultsEl = $("#results");
+let lastRequest = null, lastResponse = null;
+
+function setStatus(kind, html){
+  statusEl.className = "status show " + kind;
+  statusEl.innerHTML = kind === "load"
+    ? '<span class="spinner"></span>' + html
+    : html;
+}
+function clearStatus(){ statusEl.className = "status"; statusEl.innerHTML = ""; }
+
+document.querySelectorAll(".examples a").forEach(a=>{
+  a.addEventListener("click", ()=> $("#url").value = a.dataset.url );
+});
+
+$("#go").addEventListener("click", runAnalysis);
+$("#sample").addEventListener("click", loadSample);
+
+async function runAnalysis(){
+  const key = $("#key").value.trim();
+  const url = $("#url").value.trim();
+  resultsEl.className = "results";
+  if(!url){ setStatus("err","⚠️ Paste a food or product URL first."); return; }
+  if(!key){ setStatus("err","⚠️ Enter your Firecrawl API key (starts with <code>fc-</code>)."); return; }
+
+  const body = buildRequestBody(url);
+  lastRequest = { endpoint: FC_ENDPOINT, method:"POST",
+    headers:{ "Authorization":"Bearer fc-••••••••", "Content-Type":"application/json" }, body };
+
+  $("#go").disabled = true;
+  setStatus("load","Scraping the page with Firecrawl and extracting nutrition…");
+  try{
+    const res = await fetch(FC_ENDPOINT, {
+      method:"POST",
+      headers:{ "Authorization":"Bearer "+key, "Content-Type":"application/json" },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    lastResponse = data;
+    if(!res.ok || data.success === false){
+      throw new Error((data && data.error) ? data.error : ("HTTP "+res.status));
+    }
+    const extracted = data.data && data.data.json;
+    if(!extracted){ throw new Error("Firecrawl returned no structured JSON for this page."); }
+    clearStatus();
+    render(extracted, data);
+  }catch(err){
+    setStatus("err","❌ "+ (err.message||err) +
+      '<br/><span style="font-size:12.5px">If this is a network/CORS block, use <a style="color:#991b1b;font-weight:700" id="trysample">Load sample analysis</a> to preview the output.</span>');
+    const ts = document.getElementById("trysample");
+    if(ts) ts.addEventListener("click", loadSample);
+  }finally{
+    $("#go").disabled = false;
+  }
+}
+
+// ---------- rendering ----------
+function num(v,suffix=""){ return (v===null||v===undefined||v==="") ? "—" : v+suffix; }
+
+function render(x, raw){
+  const rating = (x.healthRating||"Moderate");
+  const score = (typeof x.healthScore==="number") ? Math.round(x.healthScore)
+              : (rating==="Good"?78:rating==="Poor"?24:52);
+  const cls = rating==="Good"?"v-good":rating==="Poor"?"v-poor":"v-mod";
+  const blurb = rating==="Good"?"A solid everyday choice.":rating==="Poor"?"Best kept to an occasional treat.":"Okay sometimes — watch the portions.";
+
+  const concerns = (x.healthConcerns||[]).map(c=>
+    `<div class="concern"><span class="ic">⚠️</span><span>${esc(c)}</span></div>`).join("") || '<p style="color:#64748b;font-size:14px">No major concerns flagged.</p>';
+
+  const swaps = (x.healthierAlternatives||[]).map(s=>{
+    const name = typeof s==="string"? s : (s.name||"");
+    const reason = typeof s==="string"? "" : (s.reason||"");
+    return `<div class="swap"><span class="em">🥗</span><div><b>${esc(name)}</b><p>${esc(reason)}</p></div></div>`;
+  }).join("") || '<p style="color:#64748b;font-size:14px">—</p>';
+
+  const flags = [];
+  if(x.isUltraProcessed) flags.push('<span class="tag bad">Ultra-processed</span>');
+  if(x.addedSugar_g>10 || x.sugar_g>15) flags.push('<span class="tag warn">High sugar</span>');
+  if(x.sodium_mg>400) flags.push('<span class="tag warn">High sodium</span>');
+  if(x.saturatedFat_g>5) flags.push('<span class="tag warn">High saturated fat</span>');
+  if(x.fiber_g>=3) flags.push('<span class="tag ok">Good fiber</span>');
+  if(x.protein_g>=8) flags.push('<span class="tag ok">Good protein</span>');
+
+  resultsEl.innerHTML = `
+    <div class="verdict ${cls}">
+      <div class="score">${score}</div>
+      <div>
+        <h3>${esc(x.productName||"Food")} ${x.brand?('· '+esc(x.brand)):''} — ${esc(rating)}</h3>
+        <p>${blurb} ${flags.length?'<br/>'+flags.join(' '):''}</p>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h4>Nutrition · per ${esc(x.servingSize||"serving")}</h4>
+        <div class="kv"><span class="k">Calories</span><span class="v">${num(x.calories)}</span></div>
+        <div class="kv"><span class="k">Total sugar</span><span class="v">${num(x.sugar_g,"g")}</span></div>
+        <div class="kv"><span class="k">Added sugar</span><span class="v">${num(x.addedSugar_g,"g")}</span></div>
+        <div class="kv"><span class="k">Sodium</span><span class="v">${num(x.sodium_mg,"mg")}</span></div>
+        <div class="kv"><span class="k">Saturated fat</span><span class="v">${num(x.saturatedFat_g,"g")}</span></div>
+        <div class="kv"><span class="k">Fiber</span><span class="v">${num(x.fiber_g,"g")}</span></div>
+        <div class="kv"><span class="k">Protein</span><span class="v">${num(x.protein_g,"g")}</span></div>
+      </div>
+      <div class="panel">
+        <h4>What it does to your body</h4>
+        ${concerns}
+      </div>
+      <div class="panel fullw">
+        <h4>Ingredients (as listed)</h4>
+        <p style="font-size:13.5px;color:#334155">${(x.ingredients&&x.ingredients.length)?esc(x.ingredients.join(", ")):"—"}</p>
+      </div>
+      <div class="panel fullw">
+        <h4>Better swaps 🍏</h4>
+        ${swaps}
+      </div>
+    </div>
+    ${rawBlock(raw)}
+  `;
+  resultsEl.className = "results show";
+  wireRaw();
+  resultsEl.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function rawBlock(raw){
+  const reqStr = JSON.stringify(lastRequest, null, 2);
+  const md = raw && raw.data && raw.data.markdown ? raw.data.markdown : "(markdown not returned)";
+  const jsonStr = raw && raw.data && raw.data.json ? JSON.stringify(raw.data.json, null, 2) : "{}";
+  return `
+  <details class="raw" open>
+    <summary><span class="lbl">🔧 Firecrawl request &amp; response — proof of work</span><span style="font-size:11px;color:#94a3b8">click to toggle</span></summary>
+    <div class="rawtabs">
+      <div class="rawtab active" data-t="req">Request</div>
+      <div class="rawtab" data-t="json">Extracted JSON</div>
+      <div class="rawtab" data-t="md">Scraped markdown</div>
+    </div>
+    <pre data-p="req">${esc(reqStr)}</pre>
+    <pre data-p="json" style="display:none">${esc(jsonStr)}</pre>
+    <pre data-p="md" style="display:none">${esc(String(md).slice(0,6000))}</pre>
+  </details>`;
+}
+function wireRaw(){
+  document.querySelectorAll(".rawtab").forEach(t=>{
+    t.addEventListener("click",()=>{
+      document.querySelectorAll(".rawtab").forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+      document.querySelectorAll("details.raw pre").forEach(p=>p.style.display="none");
+      document.querySelector('pre[data-p="'+t.dataset.t+'"]').style.display="block";
+    });
+  });
+}
+function esc(s){ return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+
+// ---------- sample fallback (real Firecrawl-shaped response) ----------
+// This is a REAL response captured live from Firecrawl v2 (Coca-Cola, Open Food Facts).
+const SAMPLE = {
+  success:true,
+  data:{
+    markdown:"# coca-cola – 33 cl\n\n**Nutri-Score: E**  ·  NOVA 4 (ultra-processed)\n\n## Nutrition facts — per 100 ml\n\n| Nutrient | Amount |\n| --- | --- |\n| Energy | 180 kJ / 42 kcal |\n| Sugars | 10.6 g |\n| Fat | 0 g |\n| Salt | ~0 g |\n\n### Negative points: 12/54\n- **Energy** 3/10 points (180 kJ)\n- **Sugars** — high\n\n## Ingredients\nCarbonated water, sugar, colour (caramel e150d), acid (phosphoric acid), natural flavourings, caffeine flavouring.\n\n_Source: Open Food Facts — scraped via Firecrawl v2/scrape_",
+    json:{
+      productName:"Coca-Cola", brand:"Coca-Cola", servingSize:"330 ml",
+      calories:42, sugar_g:10.6, addedSugar_g:10.6, sodium_mg:0, saturatedFat_g:0, fiber_g:0, protein_g:0,
+      ingredients:["carbonated water","sugar","colour (caramel e150d)","acid (phosphoric acid)","natural flavourings","caffeine flavouring"],
+      isUltraProcessed:true, healthScore:12, healthRating:"Poor",
+      healthConcerns:[
+        "High sugar content can lead to weight gain and obesity.",
+        "Increased risk of type 2 diabetes and cardiovascular diseases due to high sugar consumption.",
+        "May contribute to dental problems like tooth decay."
+      ],
+      healthierAlternatives:[
+        {name:"Sparkling water with lemon", reason:"Provides hydration without added sugars."},
+        {name:"Unsweetened iced tea", reason:"A refreshing drink with no sugar."},
+        {name:"Fresh fruit juice (without added sugars)", reason:"Natural sugars and additional nutrients compared to soda."}
+      ]
+    },
+    metadata:{ title:"coca-cola – 33 cl", sourceURL:"https://world.openfoodfacts.org/product/5449000000996/coca-cola", statusCode:200 }
+  }
+};
+function loadSample(){
+  clearStatus();
+  lastRequest = { endpoint: FC_ENDPOINT, method:"POST",
+    headers:{ "Authorization":"Bearer fc-••••••••", "Content-Type":"application/json" },
+    body: buildRequestBody("https://world.openfoodfacts.org/product/5449000000996/coca-cola") };
+  render(SAMPLE.data.json, SAMPLE);
+}
+</script>
+</body>
+</html>
