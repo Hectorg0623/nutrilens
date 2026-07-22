@@ -105,6 +105,36 @@
   .rawtab.active{color:#fff;border-bottom-color:var(--green)}
   footer{border-top:1px solid var(--line);margin-top:50px;padding:26px 0;text-align:center;color:var(--muted);font-size:13px;background:var(--card)}
   .disc{font-size:11.5px;color:#94a3b8;margin-top:16px;text-align:center;max-width:70ch;margin-left:auto;margin-right:auto}
+  html{scroll-behavior:smooth}
+  nav{position:sticky;top:0;z-index:20}
+  #how,#analyzer,#about{scroll-margin-top:84px}
+  .navlinks a{color:var(--muted);text-decoration:none;cursor:pointer;transition:color .15s}
+  .navlinks a:hover{color:var(--green-d)}
+  .hero-svg{width:280px;max-width:82%;height:auto;margin:30px auto 0;display:block}
+  .ico{width:46px;height:46px;border-radius:13px;background:var(--green-l);display:grid;place-items:center;font-size:23px;margin-bottom:12px}
+  .seelink{margin:-8px 0 18px;font-size:13px}
+  .seelink a{color:var(--green-d);text-decoration:none;border-bottom:1px dashed #86efac}
+  .scan{margin-top:22px}
+  .scan-divider{display:flex;align-items:center;gap:14px;color:var(--muted);font-size:12.5px;margin:8px 0 14px}
+  .scan-divider::before,.scan-divider::after{content:"";height:1px;background:var(--line);flex:1}
+  .dropzone{display:block;border:2px dashed #bbf7d0;border-radius:16px;background:#f7fdf9;padding:26px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .dropzone:hover{border-color:var(--green);background:#f0fdf4}
+  .dropzone.drag{border-color:var(--green);background:var(--green-l)}
+  .dz-body{display:flex;flex-direction:column;align-items:center;gap:5px}
+  .dz-body.scan-row{flex-direction:row;justify-content:center;text-align:left;gap:14px}
+  .dz-ico{font-size:30px}
+  .dz-body b{font-size:15px}
+  .dz-body span{font-size:12.5px;color:var(--muted)}
+  .dz-body em{color:var(--green-d);font-style:normal}
+  .dz-thumb{width:66px;height:66px;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
+  .protonote{margin-top:18px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:13px 16px;font-size:13px;line-height:1.5}
+  .about{margin:46px 0 8px}
+  .about h2{font-size:24px;letter-spacing:-.02em;margin-bottom:14px}
+  .about p{font-size:15.5px;color:#334155;max-width:72ch;margin-bottom:14px}
+  .about b{color:var(--green-d)}
+  .about-cta{display:inline-block;margin-top:4px;background:var(--green);color:#fff;font-weight:700;font-size:14px;padding:11px 20px;border-radius:11px;text-decoration:none}
+  .about-cta:hover{background:var(--green-d)}
+  .about .how-link{margin-left:16px;color:var(--green-d);text-decoration:none;font-size:14px;border-bottom:1px dashed #86efac}
 </style>
 </head>
 <body>
@@ -114,7 +144,7 @@
       <div class="logo">🥗</div>
       <div>NutriLens<small>Know what you eat</small></div>
     </div>
-    <div class="navlinks"><span>How it works</span><span>Analyzer</span><span>About</span></div>
+    <div class="navlinks"><a href="#how">How it works</a><a href="#analyzer">Analyzer</a><a href="#about">About</a></div>
   </div>
 </nav>
 
@@ -123,22 +153,35 @@
     <div class="pill"><span class="dot"></span> Food education, powered by real product data</div>
     <h1>Know what's <em>really</em> in your food.</h1>
     <p class="sub">NutriLens teaches you what to eat — not just what to avoid. Point it at any food and it explains what's good, what's harmful, why it matters for your body, and the better real-food swaps to reach for instead.</p>
+    <svg class="hero-svg" viewBox="0 0 240 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Scanning a plate of food for a health read">
+      <rect x="8" y="20" width="224" height="116" rx="18" fill="#ffffff" stroke="#dcfce7" stroke-width="2"/>
+      <circle cx="88" cy="80" r="42" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="2"/>
+      <circle cx="74" cy="68" r="9" fill="#ef4444"/>
+      <circle cx="100" cy="72" r="8" fill="#f59e0b"/>
+      <circle cx="84" cy="94" r="10" fill="#22c55e"/>
+      <circle cx="104" cy="94" r="7" fill="#84cc16"/>
+      <circle cx="156" cy="70" r="30" fill="none" stroke="#16a34a" stroke-width="6"/>
+      <line x1="178" y1="92" x2="202" y2="116" stroke="#16a34a" stroke-width="8" stroke-linecap="round"/>
+      <circle cx="156" cy="70" r="15" fill="#16a34a"/>
+      <path d="M149 70 l5 6 l9 -12" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
   </div>
 </header>
 
 <main class="wrap">
-  <section class="steps">
-    <div class="step"><div class="n">1</div><h3>📷 Snap or paste</h3><p>Snap your fridge (coming soon) or paste a link to any food or grocery product.</p></div>
-    <div class="step"><div class="n">2</div><h3>🔎 Analyze</h3><p>NutriLens reads the product page and pulls out the real ingredients and nutrition.</p></div>
-    <div class="step"><div class="n">3</div><h3>🧠 Learn</h3><p>Get a plain-English health read, the effects on your body, and healthier swaps.</p></div>
+  <section class="steps" id="how">
+    <div class="step"><div class="ico">📷</div><h3>Snap or paste</h3><p>Snap a food photo or paste a link to any food or grocery product.</p></div>
+    <div class="step"><div class="ico">🔎</div><h3>Analyze</h3><p>NutriLens reads the product and pulls out the real ingredients and nutrition.</p></div>
+    <div class="step"><div class="ico">🧠</div><h3>Learn</h3><p>Get a plain-English health read, the effects on your body, and healthier swaps.</p></div>
   </section>
 
-  <section class="demo">
+  <section class="demo" id="analyzer">
     <div class="demo-head">
       <h2>Food Analyzer</h2>
       <span class="fc">🔥 Powered by Firecrawl</span>
     </div>
     <p class="lead">Paste a link to any food or grocery product page. NutriLens uses <b>Firecrawl</b> to scrape the page and run an LLM extraction against a custom nutrition schema — turning a messy web page into structured health data in one call.</p>
+    <p class="seelink"><a href="#how">↑ New here? See how it works</a></p>
 
     <div class="field">
       <label for="key">Firecrawl API key <span class="hint">— starts with <code>fc-</code>, stays in your browser</span></label>
@@ -159,9 +202,29 @@
       <a data-url="https://world.openfoodfacts.org/product/0016000275270/old-fashioned-oats">Rolled Oats</a>
     </div>
 
+    <div class="scan">
+      <div class="scan-divider"><span>or scan a food photo</span></div>
+      <label class="dropzone" id="dropzone">
+        <input type="file" id="photo" accept="image/*" style="display:none" />
+        <div class="dz-body" id="dzBody">
+          <div class="dz-ico">📷</div>
+          <b>Drop a food photo here</b>
+          <span>or click to choose an image — NutriLens will scan it and show a health read<br/><em>Prototype of the coming fridge-scan feature</em></span>
+        </div>
+      </label>
+    </div>
+
     <div class="status" id="status"></div>
 
     <div class="results" id="results"></div>
+  </section>
+
+  <section class="about" id="about">
+    <h2>About NutriLens</h2>
+    <p>NutriLens grew out of one belief: <b>food consciousness</b> is the foundation of a long, healthy life. I'm Hector, and I care about helping people truly understand what they're putting into their bodies — because the small choices we make at the table every day add up to something big.</p>
+    <p>When people can clearly see what's good, what's harmful, and what to reach for instead, they make better choices. And healthier choices compound: more energy today, and a genuinely longer, healthier lifespan for those who commit to them. My goal is to keep people as healthy as possible by making that knowledge effortless — turning any food into a plain-English health read, so eating well feels simple instead of confusing.</p>
+    <a class="about-cta" href="#analyzer">Try the analyzer →</a>
+    <a class="how-link" href="#how">See how it works</a>
   </section>
 
   <p class="disc">NutriLens is an educational prototype and does not provide medical advice. Nutrition figures are extracted from third-party product pages via Firecrawl and may be incomplete. Always check the physical label and consult a professional for dietary decisions.</p>
@@ -253,6 +316,38 @@ document.querySelectorAll(".examples a").forEach(a=>{
 $("#go").addEventListener("click", runAnalysis);
 $("#sample").addEventListener("click", loadSample);
 
+// ---------- photo scan (prototype of the fridge-scan vision) ----------
+const dropzone = $("#dropzone"), photoInput = $("#photo"), dzBody = $("#dzBody");
+if(photoInput){ photoInput.addEventListener("change", e=> handlePhoto(e.target.files && e.target.files[0]) ); }
+if(dropzone){
+  ["dragenter","dragover"].forEach(ev=> dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.classList.add("drag"); }));
+  ["dragleave","dragend"].forEach(ev=> dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.classList.remove("drag"); }));
+  dropzone.addEventListener("drop", e=>{ e.preventDefault(); dropzone.classList.remove("drag"); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; handlePhoto(f); });
+}
+const PHOTO_DEMOS = [
+  { productName:"Fresh Apple", brand:"Whole fruit", servingSize:"1 medium (182 g)", calories:95, sugar_g:19, addedSugar_g:0, sodium_mg:2, saturatedFat_g:0, fiber_g:4, protein_g:0.5, ingredients:["apple"], isUltraProcessed:false, healthScore:90, healthRating:"Good", healthConcerns:["Whole fruit — the fiber slows sugar absorption and keeps you full.","A good source of vitamin C and antioxidants that support your immune system."], healthierAlternatives:[{name:"Pair with a small handful of almonds", reason:"Adds protein and healthy fats to steady your energy."}] },
+  { productName:"Potato Chips", brand:"Snack aisle", servingSize:"1 bag (50 g)", calories:270, sugar_g:0.5, addedSugar_g:0, sodium_mg:320, saturatedFat_g:3, fiber_g:2, protein_g:3, ingredients:["potatoes","vegetable oil","salt"], isUltraProcessed:true, healthScore:32, healthRating:"Poor", healthConcerns:["Fried and salty — regular snacking is linked to higher blood pressure.","Calorie-dense and easy to overeat, with little to keep you full."], healthierAlternatives:[{name:"Air-popped popcorn", reason:"Whole grain and high in fiber for far fewer calories."},{name:"Roasted chickpeas", reason:"Crunchy, with protein and fiber instead of empty calories."}] },
+  { productName:"Grilled Chicken Salad", brand:"Home cooked", servingSize:"1 bowl (350 g)", calories:320, sugar_g:6, addedSugar_g:0, sodium_mg:380, saturatedFat_g:3, fiber_g:6, protein_g:34, ingredients:["chicken breast","mixed greens","tomato","olive oil","lemon"], isUltraProcessed:false, healthScore:86, healthRating:"Good", healthConcerns:["High in lean protein and fiber — filling and supports muscle.","Plenty of vegetables deliver vitamins with very little added sugar."], healthierAlternatives:[{name:"Dress with olive oil and lemon", reason:"Skips the hidden sugar and sodium in bottled dressings."}] }
+];
+function handlePhoto(file){
+  if(!file || !/^image\//.test(file.type || "")) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const src = ev.target.result;
+    dzBody.className = "dz-body";
+    dzBody.innerHTML = '<div class="dz-ico">🔎</div><b>Scanning your photo…</b><span>Reading the food and estimating nutrition</span>';
+    setTimeout(function(){
+      const demo = PHOTO_DEMOS[Math.floor(Math.random()*PHOTO_DEMOS.length)];
+      dzBody.className = "dz-body scan-row";
+      dzBody.innerHTML = '<img class="dz-thumb" src="'+src+'" alt="scanned food"/><div><b>Scanned ✓</b><br/><span>Detected: '+esc(demo.productName)+' · drop another photo to rescan</span></div>';
+      clearStatus();
+      lastRequest = null;
+      render(demo, null, {showRaw:false});
+    }, 1200);
+  };
+  reader.readAsDataURL(file);
+}
+
 async function runAnalysis(){
   const key = $("#key").value.trim();
   const url = $("#url").value.trim();
@@ -294,7 +389,8 @@ async function runAnalysis(){
 // ---------- rendering ----------
 function num(v,suffix=""){ return (v===null||v===undefined||v==="") ? "—" : v+suffix; }
 
-function render(x, raw){
+function render(x, raw, opts){
+  opts = opts || {};
   const rating = (x.healthRating||"Moderate");
   const score = (typeof x.healthScore==="number") ? Math.round(x.healthScore)
               : (rating==="Good"?78:rating==="Poor"?24:52);
@@ -350,7 +446,7 @@ function render(x, raw){
         ${swaps}
       </div>
     </div>
-    ${rawBlock(raw)}
+    ${opts.showRaw===false ? '<div class="protonote">🔬 Prototype photo scan — this is a sample health read to show the experience. On-device recognition of the food in your photo is coming soon.</div>' : rawBlock(raw)}
   `;
   resultsEl.className = "results show";
   wireRaw();
