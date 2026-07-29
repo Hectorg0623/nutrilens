@@ -26,7 +26,7 @@
   .navlinks a:hover{color:var(--green-d)}
   .navlinks .cta{background:var(--green);color:#fff;padding:9px 16px;border-radius:10px;font-weight:700}
   .navlinks .cta:hover{background:var(--green-d);color:#fff}
-  #how,#explore,#about{scroll-margin-top:80px}
+  #how,#explore,#pantry,#about{scroll-margin-top:80px}
   .hero{padding:60px 0 26px;background:radial-gradient(1200px 440px at 50% -90px,var(--green-l),transparent);text-align:center}
   .pill{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);color:var(--green-d);font-weight:600;font-size:12.5px;padding:6px 13px;border-radius:999px;margin-bottom:22px}
   .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
@@ -139,13 +139,29 @@
   .about .btn{margin-top:6px}
   footer{border-top:1px solid var(--line);padding:26px 0;text-align:center;color:var(--muted);font-size:13px;background:var(--card)}
   .disc{font-size:11.5px;color:#94a3b8;margin:18px auto 0;text-align:center;max-width:74ch}
+  .authrow{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .authrow input{flex:1;min-width:220px;padding:12px 14px;border:1px solid var(--line);border-radius:11px;font-size:15px;font-family:inherit;background:#fff}
+  .authrow input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px var(--green-l)}
+  .btnrow2{display:flex;gap:10px;flex-wrap:wrap}
+  .pantry-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-size:14px;color:#334155;font-weight:600}
+  .pantry-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff}
+  .pantry-item .nm{font-weight:700;font-size:14.5px}
+  .pantry-item .sub{font-size:12px;color:var(--muted)}
+  .pantry-item .rm{margin-left:auto;border:none;background:none;color:#94a3b8;cursor:pointer;font-size:16px;padding:2px 6px;font-family:inherit}
+  .pantry-item .rm:hover{color:var(--red)}
+  .pantry-empty{color:var(--muted);font-size:14px;padding:8px 2px}
+  .save-btn{margin-top:12px;display:inline-flex;align-items:center;gap:7px;background:#fff;color:var(--green-d);border:1px solid #bbf7d0;border-radius:11px;padding:9px 16px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit}
+  .save-btn:hover{background:var(--green-l)}
+  .save-btn.saved{background:var(--green-l);border-color:var(--green)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(15,23,42,.25);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:60}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
 </style>
 </head>
 <body>
 <nav>
   <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;width:100%">
     <a class="brand" href="#top"><span class="logo">🥗</span><span>NutriLens<small>Know what you eat</small></span></a>
-    <div class="navlinks"><a href="#how">How it works</a><a href="#explore">Explore</a><a href="#about">About</a><a class="cta" href="#explore">Try it free</a></div>
+    <div class="navlinks"><a href="#how">How it works</a><a href="#explore">Explore</a><a href="#pantry">My Pantry</a><a href="#about">About</a><a class="cta" href="#explore">Try it free</a></div>
   </div>
 </nav>
 
@@ -235,6 +251,29 @@
   </div>
 </section>
 
+<section class="sec" id="pantry" style="padding-top:8px">
+  <div class="wrap">
+    <div class="sec-h"><div class="k">My Pantry</div><h2>Save what you scan</h2><p>Create a free account to keep a running list of the foods you check — your personal pantry.</p></div>
+    <div class="explore-wrap">
+      <div id="authBox">
+        <div class="authrow">
+          <input type="email" id="authEmail" placeholder="you@email.com" autocomplete="email" />
+          <input type="password" id="authPass" placeholder="Password (6+ characters)" autocomplete="current-password" />
+        </div>
+        <div class="btnrow2">
+          <button class="btn" id="signUpBtn" style="padding:12px 20px">Create account</button>
+          <button class="btn ghost" id="signInBtn" style="padding:12px 20px">Sign in</button>
+        </div>
+        <div class="status" id="authStatus"></div>
+      </div>
+      <div id="pantryBox" style="display:none">
+        <div class="pantry-head"><span id="whoami"></span><button class="btn ghost" id="signOutBtn" style="padding:8px 14px">Sign out</button></div>
+        <div id="pantryList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="sec" id="about" style="background:var(--card);border-top:1px solid var(--line)">
   <div class="wrap">
     <div class="about">
@@ -257,6 +296,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $ = s => document.querySelector(s);
 
@@ -536,7 +576,7 @@ async function handlePhoto(file){
 const FC_ENDPOINT="https://api.firecrawl.dev/v2/scrape";
 const NUTRI_SCHEMA={type:"object",properties:{productName:{type:"string"},brand:{type:"string"},servingSize:{type:"string"},calories:{type:"number"},sugar_g:{type:"number"},addedSugar_g:{type:"number"},sodium_mg:{type:"number"},saturatedFat_g:{type:"number"},fiber_g:{type:"number"},protein_g:{type:"number"},ingredients:{type:"array",items:{type:"string"}},isUltraProcessed:{type:"boolean"},healthScore:{type:"number"},healthRating:{type:"string",enum:["Good","Moderate","Poor"]},healthConcerns:{type:"array",items:{type:"string"}},healthierAlternatives:{type:"array",items:{type:"object",properties:{name:{type:"string"},reason:{type:"string"}}}}},required:["productName","healthRating","healthConcerns","healthierAlternatives"]};
 const EXTRACT_PROMPT="You are a registered-dietitian-style nutrition analyst. From this food or grocery product page, extract nutrition facts and the ingredient list. Then judge how healthy it is to eat regularly, give a 0-100 healthScore and a healthRating of Good/Moderate/Poor, explain the main effects on the body in plain language (healthConcerns), and suggest 3 healthier real-food alternatives (healthierAlternatives, each with a short reason). Base everything only on what the page supports.";
-let lastRequest=null;
+let lastRequest=null, lastFood=null;
 function fcBody(url){ return {url:url,onlyMainContent:true,formats:["markdown",{type:"json",prompt:EXTRACT_PROMPT,schema:NUTRI_SCHEMA}]}; }
 $("#ex").addEventListener("click",()=> $("#url").value="https://world.openfoodfacts.org/product/5449000000996/coca-cola");
 $("#go").addEventListener("click", async ()=>{
@@ -569,6 +609,7 @@ function render(x, raw, opts){
   const cls=rating==="Good"?"v-good":rating==="Poor"?"v-poor":"v-mod";
   const blurb=rating==="Good"?"A solid everyday choice.":rating==="Poor"?"Best kept to an occasional treat.":"Okay sometimes — watch the portions.";
   const emoji=x.emoji?x.emoji+" ":"";
+  lastFood={name:(x.productName||x.name||"Food"),brand:x.brand||"",rating:rating,score:score,source:source};
   const concerns=(x.healthConcerns||[]).map(c=>'<div class="concern"><span class="ic">⚠️</span><span>'+esc(c)+'</span></div>').join("")||'<p style="color:#64748b;font-size:14px">No major concerns flagged.</p>';
   const swaps=(x.healthierAlternatives||[]).map(s=>{const n=typeof s==="string"?s:(s.name||"");const r=typeof s==="string"?"":(s.reason||"");return '<div class="swap"><span class="em">🥗</span><div><b>'+esc(n)+'</b><p>'+esc(r)+'</p></div></div>';}).join("")||'<p style="color:#64748b;font-size:14px">—</p>';
   const flags=[];
@@ -587,6 +628,7 @@ function render(x, raw, opts){
     '<div class="verdict '+cls+'"><div class="score">'+score+'</div><div>'+
     '<h3>'+emoji+esc(x.productName||x.name||"Food")+(x.brand?' · '+esc(x.brand):'')+' — '+esc(rating)+'</h3>'+
     '<p>'+blurb+(flags.length?'<br/>'+flags.join(' '):'')+'</p></div></div>'+
+    '<button class="save-btn" id="saveBtn">+ Save to My Pantry</button>'+
     '<div class="grid2">'+
       '<div class="panel"><h4>Nutrition · per '+esc(x.servingSize||"serving")+'</h4>'+
       '<div class="kv"><span class="k">Calories</span><span class="v">'+num(x.calories)+'</span></div>'+
@@ -602,6 +644,7 @@ function render(x, raw, opts){
     '</div>'+tail;
   resultsEl.className="results show";
   if(source==="firecrawl") wireRaw();
+  const _save=$("#saveBtn"); if(_save) _save.addEventListener("click", savePantry);
   resultsEl.scrollIntoView({behavior:"smooth",block:"nearest"});
 }
 function rawBlock(raw){
@@ -619,6 +662,77 @@ function wireRaw(){ document.querySelectorAll(".rawtab").forEach(t=> t.addEventL
   document.querySelectorAll("details.raw pre").forEach(p=>p.style.display="none");
   document.querySelector('pre[data-p="'+t.dataset.t+'"]').style.display="block";
 })); }
+
+// ---------- Supabase auth + My Pantry (additive; guarded) ----------
+const SUPA_URL="https://ydazhmstqbdesfuqubpq.supabase.co";
+const SUPA_KEY="sb_publishable_VEbHoUTOVtLMIJryjkJNRw_LMUMVGTH";
+let sb=null, session=null;
+function toast(msg){ let t=document.getElementById("toast"); if(!t){ t=document.createElement("div"); t.id="toast"; t.className="toast"; document.body.appendChild(t);} t.textContent=msg; t.classList.add("show"); clearTimeout(window.__tt); window.__tt=setTimeout(()=>t.classList.remove("show"),2200); }
+function authMsg(kind,html){ const s=$("#authStatus"); if(!s) return; s.className="status show "+kind; s.innerHTML=html; }
+function clearAuthMsg(){ const s=$("#authStatus"); if(s){ s.className="status"; s.innerHTML=""; } }
+function initSupa(){
+  try{
+    if(!window.supabase) return;
+    sb=window.supabase.createClient(SUPA_URL, SUPA_KEY);
+    sb.auth.getSession().then(({data})=>{ session=data.session; renderAuth(); });
+    sb.auth.onAuthStateChange((_e,s)=>{ session=s; renderAuth(); });
+    const su=$("#signUpBtn"), si=$("#signInBtn"), so=$("#signOutBtn");
+    if(su) su.addEventListener("click", ()=>doAuth("signup"));
+    if(si) si.addEventListener("click", ()=>doAuth("signin"));
+    if(so) so.addEventListener("click", async ()=>{ try{ await sb.auth.signOut(); toast("Signed out"); }catch(e){} });
+  }catch(e){}
+}
+async function doAuth(mode){
+  if(!sb) return;
+  const email=($("#authEmail").value||"").trim(), pass=$("#authPass").value||"";
+  if(!email || pass.length<6){ authMsg("err","Enter an email and a password of 6+ characters."); return; }
+  authMsg("load","Working…");
+  try{
+    let res;
+    if(mode==="signup"){
+      res=await sb.auth.signUp({email,password:pass});
+      if(res.error) throw res.error;
+      if(!res.data.session){ const si=await sb.auth.signInWithPassword({email,password:pass}); if(si.error){ authMsg("err","Account created — please confirm via the email we sent, then Sign in."); return; } }
+    } else {
+      res=await sb.auth.signInWithPassword({email,password:pass});
+      if(res.error) throw res.error;
+    }
+    clearAuthMsg(); toast("Welcome to NutriLens ✓");
+  }catch(err){ authMsg("err","❌ "+(err.message||err)); }
+}
+function renderAuth(){
+  const box=$("#authBox"), pbox=$("#pantryBox"); if(!box||!pbox) return;
+  if(session && session.user){ box.style.display="none"; pbox.style.display="block"; const w=$("#whoami"); if(w) w.textContent="Signed in as "+session.user.email; refreshPantry(); }
+  else { box.style.display="block"; pbox.style.display="none"; }
+}
+async function savePantry(){
+  if(!sb){ toast("Sign-in is unavailable right now"); return; }
+  if(!session || !session.user){ toast("Sign in to save to your pantry"); const p=document.getElementById("pantry"); if(p) p.scrollIntoView({behavior:"smooth"}); return; }
+  if(!lastFood) return;
+  try{
+    const {error}=await sb.from("pantry").insert({ user_id:session.user.id, food_name:lastFood.name, brand:lastFood.brand||null, rating:lastFood.rating||null, score:(typeof lastFood.score==="number"?lastFood.score:null), source:lastFood.source||null });
+    if(error) throw error;
+    toast("Saved to My Pantry ✓");
+    const b=$("#saveBtn"); if(b){ b.textContent="✓ Saved"; b.classList.add("saved"); }
+    refreshPantry();
+  }catch(e){ toast("Couldn't save: "+(e.message||e)); }
+}
+async function refreshPantry(){
+  const list=$("#pantryList"); if(!list||!sb||!session) return;
+  try{
+    const {data,error}=await sb.from("pantry").select("*").order("created_at",{ascending:false}).limit(50);
+    if(error) throw error;
+    if(!data.length){ list.innerHTML='<div class="pantry-empty">No items yet — search or scan a food and tap “+ Save to My Pantry.”</div>'; return; }
+    list.innerHTML=data.map(it=>{
+      const rc=it.rating==="Good"?"b-good":it.rating==="Poor"?"b-poor":"b-mod";
+      return '<div class="pantry-item"><span class="badge '+rc+'" style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px">'+esc(it.rating||"—")+'</span>'+
+        '<span><span class="nm">'+esc(it.food_name)+'</span>'+(it.brand?'<br/><span class="sub">'+esc(it.brand)+'</span>':'')+'</span>'+
+        '<button class="rm" data-id="'+esc(it.id)+'" title="Remove">✕</button></div>';
+    }).join("");
+    list.querySelectorAll(".rm").forEach(b=> b.addEventListener("click", async ()=>{ try{ await sb.from("pantry").delete().eq("id",b.dataset.id); refreshPantry(); }catch(e){} }));
+  }catch(e){ list.innerHTML='<div class="pantry-empty">Couldn\'t load your pantry right now.</div>'; }
+}
+initSupa();
 </script>
 </body>
 </html>
