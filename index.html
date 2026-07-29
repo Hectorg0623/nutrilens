@@ -205,11 +205,11 @@
       <div class="scan">
         <div class="scan-divider"><span>or scan a food photo</span></div>
         <label class="dropzone" id="dropzone">
-          <input type="file" id="photo" accept="image/*" style="display:none" />
+          <input type="file" id="photo" accept="image/*,.heic,.heif" style="display:none" />
           <div class="dz-body" id="dzBody">
             <div class="dz-ico">📷</div>
             <b>Drop a food photo here</b>
-            <span>or click to choose an image — NutriLens will scan it and show a health read<br/><em>Prototype of the coming camera fridge-scan</em></span>
+            <span>or click to choose an image — on-device AI reads the food in your photo<br/><em>Beta · works best on one clear item · iPhone HEIC photos supported</em></span>
           </div>
         </label>
       </div>
@@ -253,6 +253,9 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 
@@ -347,20 +350,91 @@ photoInput.addEventListener("change", e=> handlePhoto(e.target.files && e.target
 ["dragenter","dragover"].forEach(ev=> dropzone.addEventListener(ev,e=>{e.preventDefault();dropzone.classList.add("drag");}));
 ["dragleave","dragend"].forEach(ev=> dropzone.addEventListener(ev,e=>{e.preventDefault();dropzone.classList.remove("drag");}));
 dropzone.addEventListener("drop", e=>{ e.preventDefault(); dropzone.classList.remove("drag"); handlePhoto(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]); });
-function handlePhoto(file){
-  if(!file || !/^image\//.test(file.type||"")) return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    const src=ev.target.result;
-    dzBody.className="dz-body"; dzBody.innerHTML='<div class="dz-ico">🔎</div><b>Scanning your photo…</b><span>Reading the food and estimating nutrition</span>';
-    setTimeout(function(){
-      const pick=FOODS[Math.floor(Math.random()*FOODS.length)];
+// on-device food recognition (MobileNet via TensorFlow.js)
+let mnModel=null, mnLoading=null;
+async function ensureModel(){ if(mnModel) return mnModel; if(!mnLoading) mnLoading=mobilenet.load(); mnModel=await mnLoading; return mnModel; }
+const QUICK = {
+  banana:{name:"Banana",emoji:"🍌",category:"Produce",brand:"Whole fruit",servingSize:"1 medium (118 g)",calories:105,sugar_g:14,addedSugar_g:0,sodium_mg:1,saturatedFat_g:0,fiber_g:3,protein_g:1.3,ingredients:["Banana"],isUltraProcessed:false,healthScore:88,healthRating:"Good",healthConcerns:["Whole fruit with fiber, potassium and vitamin B6.","Natural sugars are balanced by fiber for steadier energy."],healthierAlternatives:[{name:"Pair with peanut butter",reason:"Adds protein and healthy fat to stay full longer."}]},
+  orange:{name:"Orange",emoji:"🍊",category:"Produce",brand:"Whole fruit",servingSize:"1 medium (131 g)",calories:62,sugar_g:12,addedSugar_g:0,sodium_mg:0,saturatedFat_g:0,fiber_g:3,protein_g:1.2,ingredients:["Orange"],isUltraProcessed:false,healthScore:90,healthRating:"Good",healthConcerns:["Loaded with vitamin C and fiber.","Whole fruit beats juice — the fiber slows the sugar."],healthierAlternatives:[{name:"Eat it whole instead of juicing",reason:"Keeps the filling fiber."}]},
+  pizza:{name:"Pizza (slice)",emoji:"🍕",category:"Fast food",brand:"Takeout",servingSize:"1 slice (107 g)",calories:285,sugar_g:4,addedSugar_g:2,sodium_mg:640,saturatedFat_g:5,fiber_g:2,protein_g:12,ingredients:["Refined crust","Cheese","Tomato sauce","Toppings"],isUltraProcessed:true,healthScore:38,healthRating:"Moderate",healthConcerns:["High in sodium and refined carbs.","Fine occasionally — portion and toppings matter."],healthierAlternatives:[{name:"Thin-crust with veggies",reason:"Less refined dough, more nutrients."},{name:"Add a side salad",reason:"Fills you up so you eat fewer slices."}]},
+  hotdog:{name:"Hot Dog",emoji:"🌭",category:"Fast food",brand:"Processed meat",servingSize:"1 hot dog (98 g)",calories:290,sugar_g:2,addedSugar_g:1,sodium_mg:810,saturatedFat_g:6,fiber_g:1,protein_g:10,ingredients:["Processed meat","Bun","Nitrites","Additives"],isUltraProcessed:true,healthScore:22,healthRating:"Poor",healthConcerns:["Processed meat with nitrites, linked to higher cancer and heart risk.","Very high in sodium and saturated fat."],healthierAlternatives:[{name:"Grilled chicken in a whole-grain bun",reason:"Real protein, no nitrites."},{name:"Turkey or veggie dog",reason:"Cuts saturated fat."}]},
+  icecream:{name:"Ice Cream",emoji:"🍨",category:"Desserts",brand:"Frozen",servingSize:"1/2 cup (66 g)",calories:210,sugar_g:21,addedSugar_g:19,sodium_mg:80,saturatedFat_g:9,fiber_g:0,protein_g:3.5,ingredients:["Cream","Sugar","Milk","Flavoring"],isUltraProcessed:true,healthScore:26,healthRating:"Poor",healthConcerns:["High in added sugar and saturated fat.","A treat, not an everyday food."],healthierAlternatives:[{name:"Frozen Greek yogurt with berries",reason:"Creamy with protein and far less sugar."},{name:"Banana 'nice cream'",reason:"Blended frozen banana — naturally sweet."}]},
+  coffee:{name:"Black Coffee",emoji:"☕",category:"Drinks",brand:"Brewed",servingSize:"1 cup (240 ml)",calories:2,sugar_g:0,addedSugar_g:0,sodium_mg:5,saturatedFat_g:0,fiber_g:0,protein_g:0.3,ingredients:["Brewed coffee"],isUltraProcessed:false,healthScore:82,healthRating:"Good",healthConcerns:["Virtually no calories and rich in antioxidants.","Watch what you add — syrups and cream change everything."],healthierAlternatives:[{name:"Skip the flavored syrups",reason:"Keeps it near zero sugar."}]},
+  water:{name:"Water",emoji:"💧",category:"Drinks",brand:"—",servingSize:"1 glass (240 ml)",calories:0,sugar_g:0,addedSugar_g:0,sodium_mg:0,saturatedFat_g:0,fiber_g:0,protein_g:0,ingredients:["Water"],isUltraProcessed:false,healthScore:100,healthRating:"Good",healthConcerns:["The single best thing you can drink.","Zero sugar, zero calories, full hydration."],healthierAlternatives:[{name:"Add lemon or cucumber",reason:"Flavor with no sugar."}]},
+  pasta:{name:"Pasta Dish",emoji:"🍝",category:"Meals",brand:"Cooked",servingSize:"1 plate (~300 g)",calories:400,sugar_g:8,addedSugar_g:2,sodium_mg:600,saturatedFat_g:4,fiber_g:4,protein_g:14,ingredients:["Pasta","Sauce"],isUltraProcessed:false,healthScore:52,healthRating:"Moderate",healthConcerns:["Refined pasta spikes blood sugar; portions run large.","Sauce and cheese drive up sodium and fat."],healthierAlternatives:[{name:"Whole-wheat or legume pasta",reason:"More fiber and protein, steadier energy."},{name:"Load it with vegetables",reason:"More nutrients per bite."}]},
+  egg:{name:"Egg",emoji:"🥚",category:"Protein",brand:"Whole food",servingSize:"1 large (50 g)",calories:72,sugar_g:0,addedSugar_g:0,sodium_mg:71,saturatedFat_g:1.6,fiber_g:0,protein_g:6,ingredients:["Egg"],isUltraProcessed:false,healthScore:82,healthRating:"Good",healthConcerns:["High-quality protein and nutrients like choline.","Very minimally processed."],healthierAlternatives:[{name:"Boil or poach instead of frying",reason:"Skips added oils."}]},
+  fruit:{name:"Fresh Fruit",emoji:"🍓",category:"Produce",brand:"Whole food",servingSize:"1 serving",calories:60,sugar_g:12,addedSugar_g:0,sodium_mg:0,saturatedFat_g:0,fiber_g:3,protein_g:1,ingredients:["Fruit"],isUltraProcessed:false,healthScore:90,healthRating:"Good",healthConcerns:["Whole fruit brings fiber, vitamins and antioxidants.","Nature's fast food — grab it over packaged snacks."],healthierAlternatives:[{name:"Eat a rainbow",reason:"Different colors, different nutrients."}]},
+  veg:{name:"Fresh Vegetable",emoji:"🥗",category:"Produce",brand:"Whole food",servingSize:"1 cup",calories:35,sugar_g:3,addedSugar_g:0,sodium_mg:20,saturatedFat_g:0,fiber_g:3,protein_g:2,ingredients:["Vegetable"],isUltraProcessed:false,healthScore:95,healthRating:"Good",healthConcerns:["Low calorie, high fiber, packed with vitamins.","Eat more — most of us fall short."],healthierAlternatives:[{name:"Roast or steam, go easy on salt",reason:"Keeps the nutrients and flavor."}]}
+};
+const dbF = id => FOODS.find(f=>f.id===id);
+const LOOKUP = [
+  {kw:["granny smith","apple"], get:()=>dbF("apple")},
+  {kw:["banana"], get:()=>QUICK.banana},
+  {kw:["orange","tangerine","clementine","lemon","lime"], get:()=>QUICK.orange},
+  {kw:["strawberry","pineapple","fig","pomegranate","grape","peach"], get:()=>QUICK.fruit},
+  {kw:["pizza"], get:()=>QUICK.pizza},
+  {kw:["cheeseburger","hamburger"], get:()=>dbF("burger")},
+  {kw:["hotdog","hot dog","frankfurter"], get:()=>QUICK.hotdog},
+  {kw:["bagel","french loaf","baguette","pretzel","dough"], get:()=>dbF("whitebread")},
+  {kw:["chocolate sauce","chocolate syrup"], get:()=>dbF("nutella")},
+  {kw:["ice cream","icecream","ice lolly"], get:()=>QUICK.icecream},
+  {kw:["guacamole","avocado"], get:()=>dbF("avocado")},
+  {kw:["broccoli"], get:()=>dbF("broccoli")},
+  {kw:["espresso","coffee","coffeepot"], get:()=>QUICK.coffee},
+  {kw:["pop bottle","soda bottle","cola"], get:()=>dbF("coke")},
+  {kw:["water bottle"], get:()=>QUICK.water},
+  {kw:["carbonara","spaghetti","noodle"], get:()=>QUICK.pasta},
+  {kw:["scrambled egg","egg"], get:()=>QUICK.egg},
+  {kw:["mushroom","cucumber","cauliflower","bell pepper","cabbage","zucchini","artichoke","cardoon","squash","corn"], get:()=>QUICK.veg},
+  {kw:["almond","peanut","walnut","nut"], get:()=>dbF("almonds")}
+];
+function matchFood(preds){
+  for(const p of (preds||[])){
+    const n=(p.className||"").toLowerCase();
+    for(const e of LOOKUP){ if(e.kw.some(k=>n.includes(k))){ const f=e.get(); if(f) return { food:f, label:p.className.split(",")[0], conf:Math.round(p.probability*100) }; } }
+  }
+  return null;
+}
+function failScan(msg, src){
+  dzBody.className="dz-body scan-row";
+  dzBody.innerHTML=(src?'<img class="dz-thumb" src="'+src+'" alt="photo"/>':'<div class="dz-ico">📷</div>')+'<div><b>Hmm —</b><br/><span>'+msg+'</span></div>';
+  resultsEl.className="results";
+}
+async function handlePhoto(file){
+  if(!file) return;
+  const nm=(file.name||"").toLowerCase();
+  const isHeic=/heic|heif/.test(file.type||"")||/\.heic$|\.heif$/.test(nm);
+  if(!isHeic && !/^image\//.test(file.type||"")){ failScan("That doesn't look like an image. Try a JPG, PNG, or HEIC photo."); return; }
+  dzBody.className="dz-body"; dzBody.innerHTML='<div class="dz-ico">🔎</div><b>Scanning your photo…</b><span>Getting the recognition model ready</span>';
+  let blob=file;
+  try{
+    if(isHeic){
+      if(typeof heic2any==="undefined"){ failScan("That's an iPhone HEIC photo and it couldn't be converted here — upload a JPG/PNG or search by name."); return; }
+      dzBody.innerHTML='<div class="dz-ico">🔄</div><b>Converting your iPhone photo…</b><span>HEIC → JPEG</span>';
+      blob=await heic2any({blob:file, toType:"image/jpeg", quality:0.9});
+      if(Array.isArray(blob)) blob=blob[0];
+    }
+    const src=URL.createObjectURL(blob);
+    const img=new Image();
+    img.onload=async ()=>{
       dzBody.className="dz-body scan-row";
-      dzBody.innerHTML='<img class="dz-thumb" src="'+src+'" alt="scanned food"/><div><b>Scanned ✓</b><br/><span>Detected: '+esc(pick.name)+' · drop another photo to rescan</span></div>';
-      showFood(pick,"photo");
-    },1200);
-  };
-  reader.readAsDataURL(file);
+      dzBody.innerHTML='<img class="dz-thumb" src="'+src+'" alt="scanned food"/><div><b>Analyzing…</b><br/><span>Recognizing the food in your photo</span></div>';
+      try{
+        const model=await ensureModel();
+        const preds=await model.classify(img,5);
+        const m=matchFood(preds);
+        if(m && m.food){
+          dzBody.innerHTML='<img class="dz-thumb" src="'+src+'" alt="scanned food"/><div><b>Detected: '+esc(m.label)+' <span style="color:#16a34a">('+m.conf+'%)</span></b><br/><span>drop another photo to rescan</span></div>';
+          showFood(m.food,"photo");
+        } else {
+          const top=(preds&&preds[0])?preds[0].className.split(",")[0]:"";
+          failScan("I couldn't confidently spot a food I recognize"+(top?(' — my best guess was “'+esc(top)+'”'):"")+". Try a clearer shot of one item, or search by name below.", src);
+        }
+      }catch(err){ failScan("Couldn't analyze that image. Try another photo, or search by name.", src); }
+    };
+    img.onerror=()=>failScan("Couldn't open that image. Try a JPG or PNG, or search by name.");
+    img.src=src;
+  }catch(err){ failScan("Couldn't process that photo. Try a JPG or PNG, or search by name."); }
 }
 
 const FC_ENDPOINT="https://api.firecrawl.dev/v2/scrape";
@@ -410,7 +484,7 @@ function render(x, raw, opts){
   if(x.protein_g>=8) flags.push('<span class="tag ok">Good protein</span>');
   let tail;
   if(source==="firecrawl") tail=rawBlock(raw);
-  else if(source==="photo") tail='<div class="protonote">🔬 Prototype photo scan — NutriLens showed a health read from our food database to demonstrate the experience. On-device recognition of the exact food in your photo is coming soon.</div>';
+  else if(source==="photo") tail='<div class="protonote">📷 Recognized from your photo with on-device AI (beta). For foods beyond our starter database, search by name for a full read.</div>';
   else tail='<div class="srcnote">✅ Health read from the NutriLens food database — an educational estimate for a typical serving.</div>';
   resultsEl.innerHTML=
     '<div class="verdict '+cls+'"><div class="score">'+score+'</div><div>'+
