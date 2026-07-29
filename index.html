@@ -65,6 +65,7 @@
   .search .mag{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:17px;opacity:.6}
   .matches{margin-top:10px;display:none;flex-direction:column;gap:6px}
   .matches.show{display:flex}
+  .matchhdr{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#94a3b8;padding:10px 4px 2px}
   .match{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#fff;cursor:pointer;text-align:left;font-family:inherit;transition:border-color .12s,background .12s}
   .match:hover{border-color:var(--green);background:#f7fdf9}
   .match .em{font-size:20px}
@@ -193,11 +194,11 @@
 
 <section class="sec" id="explore" style="padding-top:8px">
   <div class="wrap">
-    <div class="sec-h"><div class="k">Try it free</div><h2>Look up any food</h2><p>Search our food database, tap a popular pick, or drop a photo. No sign-up, no API key.</p></div>
+    <div class="sec-h"><div class="k">Try it free</div><h2>Look up any food</h2><p>Search millions of foods and brands, tap a popular pick, or drop a photo. No sign-up, no API key.</p></div>
     <div class="explore-wrap">
       <div class="search">
         <span class="mag">🔎</span>
-        <input type="text" id="search" placeholder="Search a food — e.g. Coca-Cola, oats, avocado, cheeseburger" autocomplete="off" />
+        <input type="text" id="search" placeholder="Search any food or brand — e.g. Fruity Pebbles, Oreos, Gatorade, oats" autocomplete="off" />
         <div class="matches" id="matches"></div>
       </div>
       <div class="chips" id="chips"><span class="lab">Popular:</span></div>
@@ -329,20 +330,115 @@ POPULAR.forEach(id=>{ const f=FOODS.find(x=>x.id===id); if(!f) return;
   b.addEventListener("click",()=>{ searchEl.value=""; matchesEl.className="matches"; showFood(f,"db"); }); chipsEl.appendChild(b);
 });
 function ratingClass(r){ return r==="Good"?"b-good":r==="Poor"?"b-poor":"b-mod"; }
-searchEl.addEventListener("input", ()=>{
-  const q = searchEl.value.trim().toLowerCase();
-  if(!q){ matchesEl.className="matches"; matchesEl.innerHTML=""; return; }
-  const res = FOODS.filter(f=> f.name.toLowerCase().includes(q) || f.category.toLowerCase().includes(q)).slice(0,8);
-  matchesEl.innerHTML = res.length ? res.map(f=>(
-    '<button class="match" data-id="'+f.id+'"><span class="em">'+f.emoji+'</span>'+
-    '<span><span class="nm">'+esc(f.name)+'</span><br/><span class="cat">'+esc(f.category)+'</span></span>'+
-    '<span class="badge '+ratingClass(f.healthRating)+'">'+f.healthRating+'</span></button>'
-  )).join("") : '<div style="padding:10px 12px;color:#64748b;font-size:14px">No match in our starter database yet — try Coca-Cola, oats, salmon, or use the Advanced live scrape below.</div>';
-  matchesEl.className = "matches show";
-  matchesEl.querySelectorAll(".match").forEach(m=> m.addEventListener("click",()=>{
-    const f=FOODS.find(x=>x.id===m.dataset.id); searchEl.value=""; matchesEl.className="matches"; showFood(f,"db");
+let offTimer=null, offToken=0, curLocal=[], curOff=[], offLoading=false, curOffError=false, curQ=""; const offCache={};
+function matchRow(emoji,name,sub,rating,src,idx){
+  return '<button class="match" data-src="'+src+'" data-idx="'+esc(String(idx))+'"><span class="em">'+emoji+'</span>'+
+    '<span><span class="nm">'+esc(name)+'</span><br/><span class="cat">'+esc(sub)+'</span></span>'+
+    '<span class="badge '+ratingClass(rating)+'">'+rating+'</span></button>';
+}
+function paintMatches(){
+  if(!curQ){ matchesEl.className="matches"; matchesEl.innerHTML=""; return; }
+  let html="";
+  if(curLocal.length) html += curLocal.map(f=>matchRow(f.emoji,f.name,f.category,f.healthRating,"local",f.id)).join("");
+  if(offLoading) html += '<div class="matchhdr">Searching millions of products…</div>';
+  else if(curOff.length) html += '<div class="matchhdr">From the global food database</div>' + curOff.map((f,i)=>matchRow(f.emoji,f.name,f.brand||"Packaged food",f.healthRating,"off",i)).join("");
+  else if(curOffError) html += '<div class="matchhdr">The global database is busy — try again in a moment, or tap a popular pick.</div>';
+  else if(!curLocal.length) html += '<div class="matchhdr">No matches found — try a brand name or a simpler term.</div>';
+  matchesEl.innerHTML = html; matchesEl.className="matches show";
+  matchesEl.querySelectorAll(".match").forEach(b=> b.addEventListener("click", ()=>{
+    const f = b.dataset.src==="local" ? FOODS.find(x=>x.id===b.dataset.idx) : curOff[+b.dataset.idx];
+    if(!f) return; searchEl.value=""; curQ=""; matchesEl.className="matches"; showFood(f, b.dataset.src==="off"?"off":"db");
   }));
+}
+searchEl.addEventListener("input", ()=>{
+  const q = searchEl.value.trim(); curQ=q; const ql=q.toLowerCase();
+  curLocal = q ? FOODS.filter(f=> f.name.toLowerCase().includes(ql) || f.category.toLowerCase().includes(ql)).slice(0,6) : [];
+  curOff=[]; curOffError=false; offLoading = q.length>=2;
+  paintMatches();
+  clearTimeout(offTimer);
+  if(q.length>=2){ const token=++offToken; offTimer=setTimeout(async ()=>{ const res=await offSearch(q); if(token!==offToken) return; curOff=res.items; curOffError=res.error; offLoading=false; paintMatches(); }, 500); }
 });
+async function offSearch(term){
+  const ck=term.toLowerCase();
+  if(offCache[ck]) return offCache[ck];
+  try{
+    const u="https://world.openfoodfacts.org/cgi/search.pl?search_terms="+encodeURIComponent(term)+"&search_simple=1&action=process&json=1&page_size=14&fields=product_name,brands,nutriments,nutrition_grades,nova_group,serving_size,ingredients_text";
+    let r=await fetch(u);
+    if(r.status===429||r.status===503){ await new Promise(x=>setTimeout(x,900)); r=await fetch(u); }
+    if(!r.ok) return {items:[],error:true};
+    const j=await r.json(); const seen=new Set(); const out=[];
+    for(const p of (j.products||[])){
+      const name=(p.product_name||"").trim(); if(!name) continue;
+      const key=(name+"|"+(p.brands||"")).toLowerCase(); if(seen.has(key)) continue; seen.add(key);
+      let f=null; try{ f=offToFood(p); }catch(e){ f=null; }
+      if(f) out.push(f);
+      if(out.length>=6) break;
+    }
+    const res={items:out,error:false};
+    if(out.length) offCache[ck]=res;
+    return res;
+  }catch(e){ return {items:[],error:true}; }
+}
+function r1(v){ return (v===undefined||v===null||v===""||isNaN(v))?undefined:Math.round(v*10)/10; }
+function offToFood(p){
+  const n=p.nutriments||{}; const grade=(p.nutrition_grades||"").toLowerCase();
+  const perServing = !!p.serving_size && (n["energy-kcal_serving"]!==undefined || n["sugars_serving"]!==undefined);
+  const val=(base)=>{ const s=n[base+"_serving"], h=n[base+"_100g"]; return perServing ? (s!==undefined?s:h) : (h!==undefined?h:s); };
+  let sodium=val("sodium"); if(sodium===undefined && val("salt")!==undefined) sodium=val("salt")/2.5;
+  const gmap={a:92,b:76,c:55,d:34,e:16};
+  const kcal=val("energy-kcal");
+  if(!name0(p.product_name) || (kcal===undefined && val("sugars")===undefined && gmap[grade]===undefined)) return null;
+  const f={
+    name:p.product_name.trim(), brand:(p.brands||"").split(",")[0].trim(), emoji:emojiFor(p.product_name),
+    category:"Packaged food", servingSize: perServing ? p.serving_size : "100 g",
+    calories:r1(kcal), sugar_g:r1(val("sugars")), addedSugar_g:r1(val("added-sugars")),
+    sodium_mg:(sodium!==undefined&&!isNaN(sodium))?Math.round(sodium*1000):undefined,
+    saturatedFat_g:r1(val("saturated-fat")), fiber_g:r1(val("fiber")), protein_g:r1(val("proteins")),
+    ingredients:(p.ingredients_text||"").split(",").map(s=>s.trim()).filter(Boolean).slice(0,10),
+    isUltraProcessed:(p.nova_group===4||p.nova_group==="4")
+  };
+  f.healthScore = (gmap[grade]!==undefined) ? gmap[grade] : heuristicScore(f);
+  f.healthRating = f.healthScore>=65?"Good":f.healthScore>=40?"Moderate":"Poor";
+  f.healthConcerns = offConcerns(f);
+  f.healthierAlternatives = offSwaps(f);
+  return f;
+}
+function name0(s){ return !!(s&&s.trim()); }
+function heuristicScore(f){
+  let s=72; const sug=f.addedSugar_g!=null?f.addedSugar_g:f.sugar_g;
+  if(sug!=null){ if(sug>25)s-=34; else if(sug>15)s-=24; else if(sug>8)s-=12; }
+  if(f.sodium_mg!=null){ if(f.sodium_mg>600)s-=22; else if(f.sodium_mg>350)s-=12; }
+  if(f.saturatedFat_g!=null){ if(f.saturatedFat_g>8)s-=18; else if(f.saturatedFat_g>4)s-=9; }
+  if(f.fiber_g!=null&&f.fiber_g>=4)s+=8; if(f.protein_g!=null&&f.protein_g>=8)s+=8;
+  if(f.isUltraProcessed)s-=12;
+  return Math.max(6, Math.min(95, Math.round(s)));
+}
+function offConcerns(f){
+  const out=[]; const sug=f.addedSugar_g!=null?f.addedSugar_g:f.sugar_g;
+  if(f.isUltraProcessed) out.push("Ultra-processed (NOVA 4) — made with refined ingredients and additives.");
+  if(sug!=null&&sug>12) out.push("High in sugar (~"+sug+" g per serving) — linked to weight gain and energy crashes.");
+  if(f.sodium_mg!=null&&f.sodium_mg>400) out.push("High sodium (~"+f.sodium_mg+" mg) — worth watching for blood pressure.");
+  if(f.saturatedFat_g!=null&&f.saturatedFat_g>5) out.push("High saturated fat (~"+f.saturatedFat_g+" g) — go easy for heart health.");
+  if(f.fiber_g!=null&&f.fiber_g>=4) out.push("Good fiber (~"+f.fiber_g+" g) to help keep you full.");
+  if(f.protein_g!=null&&f.protein_g>=8) out.push("Solid protein (~"+f.protein_g+" g).");
+  if(!out.length) out.push("No major red flags in the reported nutrition — still, mind the portion and check the label.");
+  return out.slice(0,4);
+}
+function offSwaps(f){
+  const out=[]; const sug=f.addedSugar_g!=null?f.addedSugar_g:f.sugar_g;
+  if(sug!=null&&sug>12) out.push({name:"A lower-sugar or unsweetened version",reason:"Keeps what you like with far less sugar."});
+  if(f.isUltraProcessed) out.push({name:"A whole-food alternative with a short ingredient list",reason:"Fewer additives, more real nutrition."});
+  if(f.sodium_mg!=null&&f.sodium_mg>400) out.push({name:"A lower-sodium or freshly-made option",reason:"Easier on your blood pressure."});
+  if(!out.length) out.push({name:"Enjoy in moderation",reason:"Fine as an occasional choice within a balanced diet."});
+  out.push({name:"Add a whole food on the side",reason:"Fruit, nuts, or veggies make any choice better."});
+  return out.slice(0,3);
+}
+function emojiFor(name){
+  const n=(name||"").toLowerCase();
+  const map=[["cereal|pebbles|flake|granola|oat","🥣"],["cola|soda|\\bpop\\b|coke|pepsi|sprite|fanta","🥤"],["water","💧"],["juice","🧃"],["choc|nutella|candy|cookie|oreo|brownie|kit ?kat","🍫"],["chip|crisp|dorito|frito|cheeto","🥔"],["\\bbar\\b|granola bar|protein bar","🍫"],["yogurt|yoghurt|skyr","🥛"],["milk","🥛"],["bread|bagel|\\bbun\\b|toast|tortilla","🍞"],["pizza","🍕"],["burger","🍔"],["ice cream|gelato|popsicle","🍨"],["coffee|espresso|latte","☕"],["\\btea\\b","🍵"],["energy|gatorade|powerade|red ?bull|monster","⚡"],["apple","🍎"],["banana","🍌"],["chicken|nugget","🍗"],["fish|salmon|tuna","🐟"],["\\begg","🥚"],["nut|almond|peanut|cashew","🌰"],["rice|pasta|noodle|ramen|mac","🍜"],["cheese","🧀"]];
+  for(const [k,e] of map){ if(new RegExp(k).test(n)) return e; }
+  return "🛒";
+}
 function showFood(f, source){ clearStatus(); lastRequest=null; render(f, null, {source:source||"db"}); }
 
 const dropzone=$("#dropzone"), photoInput=$("#photo"), dzBody=$("#dzBody");
@@ -485,6 +581,7 @@ function render(x, raw, opts){
   let tail;
   if(source==="firecrawl") tail=rawBlock(raw);
   else if(source==="photo") tail='<div class="protonote">📷 Recognized from your photo with on-device AI (beta). For foods beyond our starter database, search by name for a full read.</div>';
+  else if(source==="off") tail='<div class="srcnote">🌍 Live data from Open Food Facts — a global, community-maintained food database. Health read computed by NutriLens from the reported nutrition.</div>';
   else tail='<div class="srcnote">✅ Health read from the NutriLens food database — an educational estimate for a typical serving.</div>';
   resultsEl.innerHTML=
     '<div class="verdict '+cls+'"><div class="score">'+score+'</div><div>'+
