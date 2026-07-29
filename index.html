@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>NutriLens — Know what you eat</title>
-<meta name="description" content="NutriLens turns any food into a plain-English health read: what's good, what's harmful, and the better swap to reach for instead." />
+<title>hygieia — Know what you eat</title>
+<meta name="description" content="hygieia turns any food into a plain-English health read: what's good, what's harmful, and the better swap to reach for instead." />
 <style>
   :root{
     --green:#16a34a; --green-d:#15803d; --green-l:#dcfce7;
@@ -160,7 +160,7 @@
 <body>
 <nav>
   <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;width:100%">
-    <a class="brand" href="#top"><span class="logo">🥗</span><span>NutriLens<small>Know what you eat</small></span></a>
+    <a class="brand" href="#top"><span class="logo">🥗</span><span>hygieia<small>Know what you eat</small></span></a>
     <div class="navlinks"><a href="#how">How it works</a><a href="#explore">Explore</a><a href="#pantry">My Pantry</a><a href="#about">About</a><a class="cta" href="#explore">Try it free</a></div>
   </div>
 </nav>
@@ -169,7 +169,7 @@
   <div class="wrap">
     <div class="pill"><span class="dot"></span> Food education, powered by real product data</div>
     <h1>Know what's <em>really</em> in your food.</h1>
-    <p class="sub">More than half of the calories we eat now come from ultra-processed food. NutriLens turns any food into a plain-English health read — what's good, what's harmful, why it matters for your body, and the better swap to reach for instead.</p>
+    <p class="sub">More than half of the calories we eat now come from ultra-processed food. hygieia turns any food into a plain-English health read — what's good, what's harmful, why it matters for your body, and the better swap to reach for instead.</p>
     <div class="hero-cta">
       <a class="btn" href="#explore">Scan your food →</a>
       <a class="btn ghost" href="#how">See how it works</a>
@@ -199,7 +199,7 @@
 
 <section class="sec" id="how">
   <div class="wrap">
-    <div class="sec-h"><div class="k">How it works</div><h2>Three taps to a clearer plate</h2><p>No nutrition degree required. NutriLens does the reading for you.</p></div>
+    <div class="sec-h"><div class="k">How it works</div><h2>Three taps to a clearer plate</h2><p>No nutrition degree required. hygieia does the reading for you.</p></div>
     <div class="steps">
       <div class="step"><div class="ico">🔎</div><h3>Search or scan</h3><p>Type any food, tap a popular pick, or drop a photo of what's on your plate.</p></div>
       <div class="step"><div class="ico">🧠</div><h3>Get the read</h3><p>A 0–100 health score, the real nutrition, and what it does to your body — in plain English.</p></div>
@@ -237,7 +237,7 @@
       <details class="adv">
         <summary>⚙️ Advanced: analyze any product page live with Firecrawl (bring your own key)</summary>
         <div class="adv-body">
-          <p style="font-size:13px;color:#64748b;margin-top:4px">Paste a link to any food/grocery product page. NutriLens uses <b>Firecrawl</b> to scrape the page and run an LLM extraction against a custom nutrition schema — turning a messy web page into structured health data in one call.</p>
+          <p style="font-size:13px;color:#64748b;margin-top:4px">Paste a link to any food/grocery product page. hygieia uses <b>Firecrawl</b> to scrape the page and run an LLM extraction against a custom nutrition schema — turning a messy web page into structured health data in one call.</p>
           <label for="key">Firecrawl API key (starts with <code>fc-</code>, stays in your browser)</label>
           <input type="password" id="key" placeholder="fc-xxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
           <div class="adv-row">
@@ -277,8 +277,8 @@
 <section class="sec" id="about" style="background:var(--card);border-top:1px solid var(--line)">
   <div class="wrap">
     <div class="about">
-      <div class="sec-h" style="margin-bottom:16px"><div class="k">About</div><h2>Why NutriLens exists</h2></div>
-      <p>NutriLens grew out of one belief: <b>food consciousness</b> is the foundation of a long, healthy life. I'm Hector, and I care about helping people truly understand what they're putting into their bodies — because the small choices we make at the table every day add up to something big.</p>
+      <div class="sec-h" style="margin-bottom:16px"><div class="k">About</div><h2>Why hygieia exists</h2></div>
+      <p>hygieia grew out of one belief: <b>food consciousness</b> is the foundation of a long, healthy life. I'm Hector, and I care about helping people truly understand what they're putting into their bodies — because the small choices we make at the table every day add up to something big.</p>
       <p>When people can clearly see what's good, what's harmful, and what to reach for instead, they make better choices. And healthier choices compound: more energy today, and a genuinely longer, healthier lifespan for those who commit to them. My goal is to keep people as healthy as possible by making that knowledge effortless — turning any food into a plain-English health read, so eating well feels simple instead of confusing.</p>
       <a class="btn" href="#explore">Try the analyzer →</a>
     </div>
@@ -287,9 +287,9 @@
 
 <footer>
   <div class="wrap">
-    <b>NutriLens</b> — a food-education prototype · built with Claude Code &amp; Firecrawl<br/>
+    <b>hygieia</b> — a food-education prototype · built with Claude Code &amp; Firecrawl<br/>
     <span style="font-size:12px">ISM6427 Final Project · <em>The Cognition Economy</em> · by Hector Gudino</span>
-    <p class="disc">NutriLens is an educational prototype and does not provide medical advice. Nutrition figures are estimates and may be incomplete. Always check the physical label and consult a professional for dietary decisions.</p>
+    <p class="disc">hygieia is an educational prototype and does not provide medical advice. Nutrition figures are estimates and may be incomplete. Always check the physical label and consult a professional for dietary decisions.</p>
   </div>
 </footer>
 
@@ -622,8 +622,8 @@ function render(x, raw, opts){
   let tail;
   if(source==="firecrawl") tail=rawBlock(raw);
   else if(source==="photo") tail='<div class="protonote">📷 Recognized from your photo with on-device AI (beta). For foods beyond our starter database, search by name for a full read.</div>';
-  else if(source==="off") tail='<div class="srcnote">🌍 Live data from Open Food Facts — a global, community-maintained food database. Health read computed by NutriLens from the reported nutrition.</div>';
-  else tail='<div class="srcnote">✅ Health read from the NutriLens food database — an educational estimate for a typical serving.</div>';
+  else if(source==="off") tail='<div class="srcnote">🌍 Live data from Open Food Facts — a global, community-maintained food database. Health read computed by hygieia from the reported nutrition.</div>';
+  else tail='<div class="srcnote">✅ Health read from the hygieia food database — an educational estimate for a typical serving.</div>';
   resultsEl.innerHTML=
     '<div class="verdict '+cls+'"><div class="score">'+score+'</div><div>'+
     '<h3>'+emoji+esc(x.productName||x.name||"Food")+(x.brand?' · '+esc(x.brand):'')+' — '+esc(rating)+'</h3>'+
@@ -697,7 +697,7 @@ async function doAuth(mode){
       res=await sb.auth.signInWithPassword({email,password:pass});
       if(res.error) throw res.error;
     }
-    clearAuthMsg(); toast("Welcome to NutriLens ✓");
+    clearAuthMsg(); toast("Welcome to hygieia ✓");
   }catch(err){ authMsg("err","❌ "+(err.message||err)); }
 }
 function renderAuth(){
