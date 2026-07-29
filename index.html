@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>NutriLens — Know what you eat</title>
+<meta name="description" content="NutriLens turns any food into a plain-English health read: what's good, what's harmful, and the better swap to reach for instead." />
 <style>
   :root{
     --green:#16a34a; --green-d:#15803d; --green-l:#dcfce7;
@@ -12,112 +13,73 @@
     --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --bg:#f8fafc; --card:#ffffff;
   }
   *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:960px;margin:0 auto;padding:0 20px}
-  /* nav */
-  nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--line);background:var(--card)}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.02em}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+  a{color:inherit}
+  nav{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line);background:rgba(255,255,255,.92);backdrop-filter:blur(8px)}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.02em;text-decoration:none;color:var(--ink)}
   .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--green),#22c55e);display:grid;place-items:center;color:#fff;font-size:19px}
   .brand small{display:block;font-weight:500;font-size:11px;color:var(--muted);letter-spacing:.02em}
-  .navlinks{display:flex;gap:22px;font-size:14px;color:var(--muted)}
-  .navlinks span{cursor:default}
-  /* hero */
-  .hero{padding:56px 0 40px;background:radial-gradient(1200px 400px at 50% -80px,var(--green-l),transparent);text-align:center}
+  .navlinks{display:flex;gap:22px;font-size:14px;color:var(--muted);align-items:center}
+  .navlinks a{color:var(--muted);text-decoration:none;transition:color .15s}
+  .navlinks a:hover{color:var(--green-d)}
+  .navlinks .cta{background:var(--green);color:#fff;padding:9px 16px;border-radius:10px;font-weight:700}
+  .navlinks .cta:hover{background:var(--green-d);color:#fff}
+  #how,#explore,#about{scroll-margin-top:80px}
+  .hero{padding:60px 0 26px;background:radial-gradient(1200px 440px at 50% -90px,var(--green-l),transparent);text-align:center}
   .pill{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);color:var(--green-d);font-weight:600;font-size:12.5px;padding:6px 13px;border-radius:999px;margin-bottom:22px}
   .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
-  h1{font-size:44px;line-height:1.08;letter-spacing:-.03em;font-weight:820;max-width:16ch;margin:0 auto}
+  h1{font-size:46px;line-height:1.07;letter-spacing:-.03em;font-weight:820;max-width:17ch;margin:0 auto}
   h1 em{font-style:normal;color:var(--green)}
   .sub{margin:20px auto 0;max-width:60ch;font-size:17.5px;color:#334155}
-  /* steps */
-  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:44px 0 8px}
-  .step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
-  .step .n{width:30px;height:30px;border-radius:9px;background:var(--green-l);color:var(--green-d);font-weight:800;display:grid;place-items:center;font-size:15px;margin-bottom:12px}
-  .step h3{font-size:16px;margin-bottom:5px;letter-spacing:-.01em}
-  .step p{font-size:13.5px;color:var(--muted)}
-  /* demo card */
-  .demo{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;margin:34px 0 20px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
-  .demo-head{display:flex;align-items:center;gap:11px;margin-bottom:4px}
-  .demo-head h2{font-size:22px;letter-spacing:-.02em}
-  .fc{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#c2410c;background:#fff7ed;border:1px solid #fed7aa;padding:4px 10px;border-radius:999px}
-  .demo>.lead{color:var(--muted);font-size:14.5px;margin:6px 0 22px;max-width:70ch}
-  .field{margin-bottom:14px}
-  label{display:block;font-size:12.5px;font-weight:700;color:#334155;margin-bottom:6px;letter-spacing:.01em}
-  label .hint{font-weight:500;color:var(--muted)}
-  input[type=text],input[type=password]{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:11px;font-size:14.5px;font-family:inherit;background:#fff;transition:border .15s,box-shadow .15s}
-  input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px var(--green-l)}
-  .row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
-  .row .field{flex:1;min-width:230px;margin-bottom:0}
-  .btn{appearance:none;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:15px;padding:12px 22px;border-radius:11px;background:var(--green);color:#fff;transition:background .15s,transform .05s}
+  .hero-cta{display:inline-flex;gap:12px;margin-top:26px;flex-wrap:wrap;justify-content:center}
+  .btn{appearance:none;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:15px;padding:13px 24px;border-radius:12px;background:var(--green);color:#fff;text-decoration:none;display:inline-block;transition:background .15s,transform .05s}
   .btn:hover{background:var(--green-d)}
   .btn:active{transform:translateY(1px)}
   .btn:disabled{opacity:.6;cursor:not-allowed}
   .btn.ghost{background:#fff;color:#334155;border:1px solid var(--line)}
   .btn.ghost:hover{background:#f1f5f9}
-  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
-  .examples{margin-top:14px;font-size:12.5px;color:var(--muted)}
-  .examples a{color:var(--green-d);cursor:pointer;text-decoration:none;border-bottom:1px dashed #86efac}
-  .examples a:hover{color:var(--green)}
-  /* status */
-  .status{display:none;margin-top:20px;padding:14px 16px;border-radius:12px;font-size:14px;align-items:center;gap:10px}
-  .status.show{display:flex}
-  .status.load{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
-  .status.err{background:var(--red-l);color:#991b1b;border:1px solid #fecaca}
-  .spinner{width:16px;height:16px;border:2.5px solid #bfdbfe;border-top-color:#1d4ed8;border-radius:50%;animation:spin .7s linear infinite;flex:none}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  /* results */
-  .results{display:none;margin-top:26px}
-  .results.show{display:block}
-  .verdict{display:flex;align-items:center;gap:18px;padding:20px;border-radius:16px;margin-bottom:20px;border:1px solid}
-  .verdict .score{width:74px;height:74px;border-radius:16px;display:grid;place-items:center;font-weight:850;font-size:26px;color:#fff;flex:none}
-  .verdict h3{font-size:21px;letter-spacing:-.02em}
-  .verdict p{font-size:14px;color:#475569;margin-top:2px}
-  .v-good{background:var(--green-l);border-color:#bbf7d0}.v-good .score{background:var(--green)}.v-good h3{color:var(--green-d)}
-  .v-mod{background:var(--amber-l);border-color:#fde68a}.v-mod .score{background:var(--amber)}.v-mod h3{color:#b45309}
-  .v-poor{background:var(--red-l);border-color:#fecaca}.v-poor .score{background:var(--red)}.v-poor h3{color:#b91c1c}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:720px){.grid2{grid-template-columns:1fr}.steps{grid-template-columns:1fr}h1{font-size:34px}}
-  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
-  .panel h4{font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:12px}
-  .kv{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:14px}
-  .kv:last-child{border-bottom:none}
-  .kv .k{color:#475569}
-  .kv .v{font-weight:700;text-align:right}
-  .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;margin:0 4px 4px 0}
-  .tag.bad{background:var(--red-l);color:#b91c1c}
-  .tag.warn{background:var(--amber-l);color:#b45309}
-  .tag.ok{background:var(--green-l);color:var(--green-d)}
-  .concern{display:flex;gap:10px;font-size:14px;padding:9px 0;border-bottom:1px solid #f1f5f9}
-  .concern:last-child{border-bottom:none}
-  .concern .ic{flex:none;margin-top:1px}
-  .swap{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:13px;margin-bottom:10px;background:#fbfefc}
-  .swap .em{font-size:22px;flex:none}
-  .swap b{font-size:14.5px}
-  .swap p{font-size:13px;color:var(--muted);margin-top:2px}
-  .fullw{grid-column:1/-1}
-  /* raw */
-  details.raw{margin-top:18px;border:1px solid var(--line);border-radius:14px;background:#0f172a;overflow:hidden}
-  details.raw summary{cursor:pointer;padding:13px 18px;color:#e2e8f0;font-weight:700;font-size:13.5px;list-style:none;display:flex;align-items:center;justify-content:space-between;background:#1e293b}
-  details.raw summary::-webkit-details-marker{display:none}
-  details.raw summary .lbl{display:flex;align-items:center;gap:9px}
-  details.raw pre{margin:0;padding:16px 18px;overflow:auto;max-height:420px;color:#a5f3d0;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.6}
-  .rawtabs{display:flex;gap:0;background:#1e293b;border-top:1px solid #334155}
-  .rawtab{padding:9px 16px;font-size:12.5px;font-weight:600;color:#94a3b8;cursor:pointer;border-bottom:2px solid transparent}
-  .rawtab.active{color:#fff;border-bottom-color:var(--green)}
-  footer{border-top:1px solid var(--line);margin-top:50px;padding:26px 0;text-align:center;color:var(--muted);font-size:13px;background:var(--card)}
-  .disc{font-size:11.5px;color:#94a3b8;margin-top:16px;text-align:center;max-width:70ch;margin-left:auto;margin-right:auto}
-  html{scroll-behavior:smooth}
-  nav{position:sticky;top:0;z-index:20}
-  #how,#analyzer,#about{scroll-margin-top:84px}
-  .navlinks a{color:var(--muted);text-decoration:none;cursor:pointer;transition:color .15s}
-  .navlinks a:hover{color:var(--green-d)}
-  .hero-svg{width:280px;max-width:82%;height:auto;margin:30px auto 0;display:block}
+  .hero-svg{width:290px;max-width:82%;height:auto;margin:34px auto 0;display:block}
+  .stats{background:var(--ink);color:#fff}
+  .stats .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:26px 20px}
+  .stat{text-align:center;padding:6px}
+  .stat .big{font-size:30px;font-weight:850;letter-spacing:-.02em;color:#86efac}
+  .stat .lbl{font-size:12.5px;color:#cbd5e1;margin-top:4px;line-height:1.4}
+  .stats .src{grid-column:1/-1;text-align:center;font-size:11px;color:#64748b;margin-top:4px}
+  @media(max-width:720px){.stats .wrap{grid-template-columns:repeat(2,1fr)}}
+  .sec{padding:52px 0}
+  .sec-h{text-align:center;max-width:60ch;margin:0 auto 30px}
+  .sec-h .k{font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green-d)}
+  .sec-h h2{font-size:30px;letter-spacing:-.02em;margin:8px 0 10px}
+  .sec-h p{color:var(--muted);font-size:16px}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
   .ico{width:46px;height:46px;border-radius:13px;background:var(--green-l);display:grid;place-items:center;font-size:23px;margin-bottom:12px}
-  .seelink{margin:-8px 0 18px;font-size:13px}
-  .seelink a{color:var(--green-d);text-decoration:none;border-bottom:1px dashed #86efac}
-  .scan{margin-top:22px}
+  .step h3{font-size:16.5px;margin-bottom:5px;letter-spacing:-.01em}
+  .step p{font-size:14px;color:var(--muted)}
+  .explore-wrap{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  .search{position:relative}
+  .search input{width:100%;padding:16px 16px 16px 46px;border:1px solid var(--line);border-radius:13px;font-size:16px;font-family:inherit;background:#fff}
+  .search input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px var(--green-l)}
+  .search .mag{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:17px;opacity:.6}
+  .matches{margin-top:10px;display:none;flex-direction:column;gap:6px}
+  .matches.show{display:flex}
+  .match{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#fff;cursor:pointer;text-align:left;font-family:inherit;transition:border-color .12s,background .12s}
+  .match:hover{border-color:var(--green);background:#f7fdf9}
+  .match .em{font-size:20px}
+  .match .nm{font-weight:700;font-size:14.5px}
+  .match .cat{font-size:12px;color:var(--muted)}
+  .match .badge{margin-left:auto;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px}
+  .b-good{background:var(--green-l);color:var(--green-d)} .b-mod{background:var(--amber-l);color:#b45309} .b-poor{background:var(--red-l);color:#b91c1c}
+  .chips{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .chips .lab{font-size:12.5px;color:var(--muted);margin-right:2px}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-size:13px;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:border-color .12s,background .12s}
+  .chip:hover{border-color:var(--green);background:#f7fdf9}
+  .scan{margin-top:20px}
   .scan-divider{display:flex;align-items:center;gap:14px;color:var(--muted);font-size:12.5px;margin:8px 0 14px}
   .scan-divider::before,.scan-divider::after{content:"";height:1px;background:var(--line);flex:1}
-  .dropzone{display:block;border:2px dashed #bbf7d0;border-radius:16px;background:#f7fdf9;padding:26px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .dropzone{display:block;border:2px dashed #bbf7d0;border-radius:16px;background:#f7fdf9;padding:24px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
   .dropzone:hover{border-color:var(--green);background:#f0fdf4}
   .dropzone.drag{border-color:var(--green);background:var(--green-l)}
   .dz-body{display:flex;flex-direction:column;align-items:center;gap:5px}
@@ -127,39 +89,79 @@
   .dz-body span{font-size:12.5px;color:var(--muted)}
   .dz-body em{color:var(--green-d);font-style:normal}
   .dz-thumb{width:66px;height:66px;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
-  .protonote{margin-top:18px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:13px 16px;font-size:13px;line-height:1.5}
-  .about{margin:46px 0 8px}
-  .about h2{font-size:24px;letter-spacing:-.02em;margin-bottom:14px}
-  .about p{font-size:15.5px;color:#334155;max-width:72ch;margin-bottom:14px}
+  .status{display:none;margin-top:18px;padding:14px 16px;border-radius:12px;font-size:14px;align-items:center;gap:10px}
+  .status.show{display:flex}
+  .status.err{background:var(--red-l);color:#991b1b;border:1px solid #fecaca}
+  .status.load{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+  .results{display:none;margin-top:24px}
+  .results.show{display:block}
+  .verdict{display:flex;align-items:center;gap:18px;padding:20px;border-radius:16px;margin-bottom:18px;border:1px solid}
+  .verdict .score{width:74px;height:74px;border-radius:16px;display:grid;place-items:center;font-weight:850;font-size:26px;color:#fff;flex:none}
+  .verdict h3{font-size:21px;letter-spacing:-.02em}
+  .verdict p{font-size:14px;color:#475569;margin-top:3px}
+  .v-good{background:var(--green-l);border-color:#bbf7d0}.v-good .score{background:var(--green)}.v-good h3{color:var(--green-d)}
+  .v-mod{background:var(--amber-l);border-color:#fde68a}.v-mod .score{background:var(--amber)}.v-mod h3{color:#b45309}
+  .v-poor{background:var(--red-l);border-color:#fecaca}.v-poor .score{background:var(--red)}.v-poor h3{color:#b91c1c}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;margin:4px 4px 0 0}
+  .tag.bad{background:var(--red-l);color:#b91c1c}.tag.warn{background:var(--amber-l);color:#b45309}.tag.ok{background:var(--green-l);color:var(--green-d)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}.steps{grid-template-columns:1fr}h1{font-size:34px}.sec-h h2{font-size:24px}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+  .panel h4{font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:12px}
+  .kv{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:14px}
+  .kv:last-child{border-bottom:none}.kv .k{color:#475569}.kv .v{font-weight:700;text-align:right}
+  .concern{display:flex;gap:10px;font-size:14px;padding:9px 0;border-bottom:1px solid #f1f5f9}
+  .concern:last-child{border-bottom:none}.concern .ic{flex:none;margin-top:1px}
+  .swap{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:13px;margin-bottom:10px;background:#fbfefc}
+  .swap .em{font-size:22px;flex:none}.swap b{font-size:14.5px}.swap p{font-size:13px;color:var(--muted);margin-top:2px}
+  .fullw{grid-column:1/-1}
+  .srcnote{margin-top:16px;background:#f0fdf4;border:1px solid #bbf7d0;color:var(--green-d);border-radius:12px;padding:12px 15px;font-size:12.5px}
+  .protonote{margin-top:16px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:12px 15px;font-size:12.5px;line-height:1.5}
+  details.adv{margin-top:20px;border:1px solid var(--line);border-radius:14px;background:#fbfdff;overflow:hidden}
+  details.adv>summary{cursor:pointer;padding:14px 18px;font-weight:700;font-size:13.5px;color:#334155;list-style:none;display:flex;align-items:center;gap:8px}
+  details.adv>summary::-webkit-details-marker{display:none}
+  .adv-body{padding:0 18px 18px}
+  .adv-body label{display:block;font-size:12px;font-weight:700;color:#334155;margin:10px 0 6px}
+  .adv-body input{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit}
+  .adv-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:6px}
+  .adv-row .f{flex:1;min-width:220px}
+  details.raw{margin-top:16px;border:1px solid var(--line);border-radius:14px;background:#0f172a;overflow:hidden}
+  details.raw summary{cursor:pointer;padding:12px 16px;color:#e2e8f0;font-weight:700;font-size:13px;list-style:none;display:flex;align-items:center;justify-content:space-between;background:#1e293b}
+  details.raw summary::-webkit-details-marker{display:none}
+  details.raw pre{margin:0;padding:15px 16px;overflow:auto;max-height:360px;color:#a5f3d0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.6}
+  .rawtabs{display:flex;background:#1e293b;border-top:1px solid #334155}
+  .rawtab{padding:9px 15px;font-size:12px;font-weight:600;color:#94a3b8;cursor:pointer;border-bottom:2px solid transparent}
+  .rawtab.active{color:#fff;border-bottom-color:var(--green)}
+  .about{max-width:760px;margin:0 auto;text-align:center}
+  .about p{font-size:16px;color:#334155;margin-bottom:16px}
   .about b{color:var(--green-d)}
-  .about-cta{display:inline-block;margin-top:4px;background:var(--green);color:#fff;font-weight:700;font-size:14px;padding:11px 20px;border-radius:11px;text-decoration:none}
-  .about-cta:hover{background:var(--green-d)}
-  .about .how-link{margin-left:16px;color:var(--green-d);text-decoration:none;font-size:14px;border-bottom:1px dashed #86efac}
+  .about .btn{margin-top:6px}
+  footer{border-top:1px solid var(--line);padding:26px 0;text-align:center;color:var(--muted);font-size:13px;background:var(--card)}
+  .disc{font-size:11.5px;color:#94a3b8;margin:18px auto 0;text-align:center;max-width:74ch}
 </style>
 </head>
 <body>
 <nav>
-  <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;width:100%;padding:0 20px">
-    <div class="brand">
-      <div class="logo">🥗</div>
-      <div>NutriLens<small>Know what you eat</small></div>
-    </div>
-    <div class="navlinks"><a href="#how">How it works</a><a href="#analyzer">Analyzer</a><a href="#about">About</a></div>
+  <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;width:100%">
+    <a class="brand" href="#top"><span class="logo">🥗</span><span>NutriLens<small>Know what you eat</small></span></a>
+    <div class="navlinks"><a href="#how">How it works</a><a href="#explore">Explore</a><a href="#about">About</a><a class="cta" href="#explore">Try it free</a></div>
   </div>
 </nav>
 
-<header class="hero">
+<header class="hero" id="top">
   <div class="wrap">
     <div class="pill"><span class="dot"></span> Food education, powered by real product data</div>
     <h1>Know what's <em>really</em> in your food.</h1>
-    <p class="sub">NutriLens teaches you what to eat — not just what to avoid. Point it at any food and it explains what's good, what's harmful, why it matters for your body, and the better real-food swaps to reach for instead.</p>
+    <p class="sub">More than half of the calories we eat now come from ultra-processed food. NutriLens turns any food into a plain-English health read — what's good, what's harmful, why it matters for your body, and the better swap to reach for instead.</p>
+    <div class="hero-cta">
+      <a class="btn" href="#explore">Scan your food →</a>
+      <a class="btn ghost" href="#how">See how it works</a>
+    </div>
     <svg class="hero-svg" viewBox="0 0 240 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Scanning a plate of food for a health read">
       <rect x="8" y="20" width="224" height="116" rx="18" fill="#ffffff" stroke="#dcfce7" stroke-width="2"/>
       <circle cx="88" cy="80" r="42" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="2"/>
-      <circle cx="74" cy="68" r="9" fill="#ef4444"/>
-      <circle cx="100" cy="72" r="8" fill="#f59e0b"/>
-      <circle cx="84" cy="94" r="10" fill="#22c55e"/>
-      <circle cx="104" cy="94" r="7" fill="#84cc16"/>
+      <circle cx="74" cy="68" r="9" fill="#ef4444"/><circle cx="100" cy="72" r="8" fill="#f59e0b"/>
+      <circle cx="84" cy="94" r="10" fill="#22c55e"/><circle cx="104" cy="94" r="7" fill="#84cc16"/>
       <circle cx="156" cy="70" r="30" fill="none" stroke="#16a34a" stroke-width="6"/>
       <line x1="178" y1="92" x2="202" y2="116" stroke="#16a34a" stroke-width="8" stroke-linecap="round"/>
       <circle cx="156" cy="70" r="15" fill="#16a34a"/>
@@ -168,352 +170,284 @@
   </div>
 </header>
 
-<main class="wrap">
-  <section class="steps" id="how">
-    <div class="step"><div class="ico">📷</div><h3>Snap or paste</h3><p>Snap a food photo or paste a link to any food or grocery product.</p></div>
-    <div class="step"><div class="ico">🔎</div><h3>Analyze</h3><p>NutriLens reads the product and pulls out the real ingredients and nutrition.</p></div>
-    <div class="step"><div class="ico">🧠</div><h3>Learn</h3><p>Get a plain-English health read, the effects on your body, and healthier swaps.</p></div>
-  </section>
+<section class="stats">
+  <div class="wrap">
+    <div class="stat"><div class="big">55%</div><div class="lbl">of Americans' daily calories are ultra-processed</div></div>
+    <div class="stat"><div class="big">40%</div><div class="lbl">of U.S. adults now have obesity</div></div>
+    <div class="stat"><div class="big">~1M</div><div class="lbl">Americans die each year from diet-related disease</div></div>
+    <div class="stat"><div class="big">$50B+</div><div class="lbl">in yearly U.S. healthcare costs tied to poor diet</div></div>
+    <div class="src">Sources: CDC (2025), NHANES, Harvard T.H. Chan School of Public Health</div>
+  </div>
+</section>
 
-  <section class="demo" id="analyzer">
-    <div class="demo-head">
-      <h2>Food Analyzer</h2>
-      <span class="fc">🔥 Powered by Firecrawl</span>
+<section class="sec" id="how">
+  <div class="wrap">
+    <div class="sec-h"><div class="k">How it works</div><h2>Three taps to a clearer plate</h2><p>No nutrition degree required. NutriLens does the reading for you.</p></div>
+    <div class="steps">
+      <div class="step"><div class="ico">🔎</div><h3>Search or scan</h3><p>Type any food, tap a popular pick, or drop a photo of what's on your plate.</p></div>
+      <div class="step"><div class="ico">🧠</div><h3>Get the read</h3><p>A 0–100 health score, the real nutrition, and what it does to your body — in plain English.</p></div>
+      <div class="step"><div class="ico">🥗</div><h3>Swap smarter</h3><p>See healthier real-food alternatives you can actually reach for instead.</p></div>
     </div>
-    <p class="lead">Paste a link to any food or grocery product page. NutriLens uses <b>Firecrawl</b> to scrape the page and run an LLM extraction against a custom nutrition schema — turning a messy web page into structured health data in one call.</p>
-    <p class="seelink"><a href="#how">↑ New here? See how it works</a></p>
+  </div>
+</section>
 
-    <div class="field">
-      <label for="key">Firecrawl API key <span class="hint">— starts with <code>fc-</code>, stays in your browser</span></label>
-      <input type="password" id="key" placeholder="fc-xxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
-    </div>
-    <div class="row">
-      <div class="field">
-        <label for="url">Food / product URL</label>
-        <input type="text" id="url" placeholder="https://…" />
+<section class="sec" id="explore" style="padding-top:8px">
+  <div class="wrap">
+    <div class="sec-h"><div class="k">Try it free</div><h2>Look up any food</h2><p>Search our food database, tap a popular pick, or drop a photo. No sign-up, no API key.</p></div>
+    <div class="explore-wrap">
+      <div class="search">
+        <span class="mag">🔎</span>
+        <input type="text" id="search" placeholder="Search a food — e.g. Coca-Cola, oats, avocado, cheeseburger" autocomplete="off" />
+        <div class="matches" id="matches"></div>
       </div>
-      <button class="btn" id="go">Analyze food →</button>
-      <button class="btn ghost" id="sample">See a sample result</button>
-    </div>
-    <div class="examples">Try an example:
-      <a data-url="https://world.openfoodfacts.org/product/5449000000996/coca-cola">Coca-Cola</a> ·
-      <a data-url="https://world.openfoodfacts.org/product/3017620422003/nutella">Nutella</a> ·
-      <a data-url="https://world.openfoodfacts.org/product/0038000199530/frosted-flakes">Frosted Flakes</a> ·
-      <a data-url="https://world.openfoodfacts.org/product/0016000275270/old-fashioned-oats">Rolled Oats</a>
-    </div>
+      <div class="chips" id="chips"><span class="lab">Popular:</span></div>
 
-    <div class="scan">
-      <div class="scan-divider"><span>or scan a food photo</span></div>
-      <label class="dropzone" id="dropzone">
-        <input type="file" id="photo" accept="image/*" style="display:none" />
-        <div class="dz-body" id="dzBody">
-          <div class="dz-ico">📷</div>
-          <b>Drop a food photo here</b>
-          <span>or click to choose an image — NutriLens will scan it and show a health read<br/><em>Prototype of the coming fridge-scan feature</em></span>
+      <div class="scan">
+        <div class="scan-divider"><span>or scan a food photo</span></div>
+        <label class="dropzone" id="dropzone">
+          <input type="file" id="photo" accept="image/*" style="display:none" />
+          <div class="dz-body" id="dzBody">
+            <div class="dz-ico">📷</div>
+            <b>Drop a food photo here</b>
+            <span>or click to choose an image — NutriLens will scan it and show a health read<br/><em>Prototype of the coming camera fridge-scan</em></span>
+          </div>
+        </label>
+      </div>
+
+      <div class="status" id="status"></div>
+      <div class="results" id="results"></div>
+
+      <details class="adv">
+        <summary>⚙️ Advanced: analyze any product page live with Firecrawl (bring your own key)</summary>
+        <div class="adv-body">
+          <p style="font-size:13px;color:#64748b;margin-top:4px">Paste a link to any food/grocery product page. NutriLens uses <b>Firecrawl</b> to scrape the page and run an LLM extraction against a custom nutrition schema — turning a messy web page into structured health data in one call.</p>
+          <label for="key">Firecrawl API key (starts with <code>fc-</code>, stays in your browser)</label>
+          <input type="password" id="key" placeholder="fc-xxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
+          <div class="adv-row">
+            <div class="f"><label for="url">Product URL</label><input type="text" id="url" placeholder="https://…" /></div>
+            <button class="btn" id="go" style="padding:11px 18px">Live scrape →</button>
+          </div>
+          <p style="font-size:12px;color:#94a3b8;margin-top:10px">Try: <a id="ex" style="color:var(--green-d);cursor:pointer">world.openfoodfacts.org/product/5449000000996/coca-cola</a></p>
         </div>
-      </label>
+      </details>
     </div>
+  </div>
+</section>
 
-    <div class="status" id="status"></div>
-
-    <div class="results" id="results"></div>
-  </section>
-
-  <section class="about" id="about">
-    <h2>About NutriLens</h2>
-    <p>NutriLens grew out of one belief: <b>food consciousness</b> is the foundation of a long, healthy life. I'm Hector, and I care about helping people truly understand what they're putting into their bodies — because the small choices we make at the table every day add up to something big.</p>
-    <p>When people can clearly see what's good, what's harmful, and what to reach for instead, they make better choices. And healthier choices compound: more energy today, and a genuinely longer, healthier lifespan for those who commit to them. My goal is to keep people as healthy as possible by making that knowledge effortless — turning any food into a plain-English health read, so eating well feels simple instead of confusing.</p>
-    <a class="about-cta" href="#analyzer">Try the analyzer →</a>
-    <a class="how-link" href="#how">See how it works</a>
-  </section>
-
-  <p class="disc">NutriLens is an educational prototype and does not provide medical advice. Nutrition figures are extracted from third-party product pages via Firecrawl and may be incomplete. Always check the physical label and consult a professional for dietary decisions.</p>
-</main>
+<section class="sec" id="about" style="background:var(--card);border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="about">
+      <div class="sec-h" style="margin-bottom:16px"><div class="k">About</div><h2>Why NutriLens exists</h2></div>
+      <p>NutriLens grew out of one belief: <b>food consciousness</b> is the foundation of a long, healthy life. I'm Hector, and I care about helping people truly understand what they're putting into their bodies — because the small choices we make at the table every day add up to something big.</p>
+      <p>When people can clearly see what's good, what's harmful, and what to reach for instead, they make better choices. And healthier choices compound: more energy today, and a genuinely longer, healthier lifespan for those who commit to them. My goal is to keep people as healthy as possible by making that knowledge effortless — turning any food into a plain-English health read, so eating well feels simple instead of confusing.</p>
+      <a class="btn" href="#explore">Try the analyzer →</a>
+    </div>
+  </div>
+</section>
 
 <footer>
   <div class="wrap">
-    <b>NutriLens</b> — a food-education prototype · Firecrawl-powered analyzer demo<br/>
-    Built for ISM6427C · <em>The Cognition Economy</em>, Ch. 4 — Skills
+    <b>NutriLens</b> — a food-education prototype · built with Claude Code &amp; Firecrawl<br/>
+    <span style="font-size:12px">ISM6427 Final Project · <em>The Cognition Economy</em> · by Hector Gudino</span>
+    <p class="disc">NutriLens is an educational prototype and does not provide medical advice. Nutrition figures are estimates and may be incomplete. Always check the physical label and consult a professional for dietary decisions.</p>
   </div>
 </footer>
 
 <script>
-const FC_ENDPOINT = "https://api.firecrawl.dev/v2/scrape";
-
-// ---- The "skill" we teach the AI: a nutrition-analysis extraction schema ----
-const NUTRI_SCHEMA = {
-  type: "object",
-  properties: {
-    productName: { type: "string", description: "Name of the food product" },
-    brand: { type: "string" },
-    servingSize: { type: "string", description: "e.g. '1 can (330ml)'" },
-    calories: { type: "number", description: "Calories per serving" },
-    sugar_g: { type: "number", description: "Total sugars per serving in grams" },
-    addedSugar_g: { type: "number" },
-    sodium_mg: { type: "number" },
-    saturatedFat_g: { type: "number" },
-    fiber_g: { type: "number" },
-    protein_g: { type: "number" },
-    ingredients: { type: "array", items: { type: "string" } },
-    isUltraProcessed: { type: "boolean", description: "True if it fits the NOVA ultra-processed category" },
-    healthScore: { type: "number", description: "0 (worst) to 100 (best) overall healthfulness score" },
-    healthRating: { type: "string", enum: ["Good", "Moderate", "Poor"] },
-    healthConcerns: {
-      type: "array",
-      description: "Short plain-English notes on how eating this regularly affects the body",
-      items: { type: "string" }
-    },
-    healthierAlternatives: {
-      type: "array",
-      description: "3 healthier real-food swaps, each with why it's better",
-      items: {
-        type: "object",
-        properties: {
-          name: { type: "string" },
-          reason: { type: "string" }
-        }
-      }
-    }
-  },
-  required: ["productName", "healthRating", "healthConcerns", "healthierAlternatives"]
-};
-
-const EXTRACT_PROMPT =
-  "You are a registered-dietitian-style nutrition analyst. From this food or grocery product page, " +
-  "extract the product's nutrition facts and ingredient list. Then judge how healthy it is to eat regularly, " +
-  "give a 0-100 healthScore and a healthRating of Good/Moderate/Poor, explain the main effects on the body in " +
-  "plain language (healthConcerns), and suggest 3 healthier real-food alternatives a shopper could choose instead " +
-  "(healthierAlternatives, each with a short reason). Base everything only on what the page supports.";
-
-function buildRequestBody(url){
-  return {
-    url: url,
-    onlyMainContent: true,
-    formats: [
-      "markdown",
-      { type: "json", prompt: EXTRACT_PROMPT, schema: NUTRI_SCHEMA }
-    ]
-  };
-}
-
-// ---------- UI helpers ----------
 const $ = s => document.querySelector(s);
-const statusEl = $("#status"), resultsEl = $("#results");
-let lastRequest = null, lastResponse = null;
 
-function setStatus(kind, html){
-  statusEl.className = "status show " + kind;
-  statusEl.innerHTML = kind === "load"
-    ? '<span class="spinner"></span>' + html
-    : html;
-}
-function clearStatus(){ statusEl.className = "status"; statusEl.innerHTML = ""; }
-
-document.querySelectorAll(".examples a").forEach(a=>{
-  a.addEventListener("click", ()=> $("#url").value = a.dataset.url );
-});
-
-$("#go").addEventListener("click", runAnalysis);
-$("#sample").addEventListener("click", loadSample);
-
-// ---------- photo scan (prototype of the fridge-scan vision) ----------
-const dropzone = $("#dropzone"), photoInput = $("#photo"), dzBody = $("#dzBody");
-if(photoInput){ photoInput.addEventListener("change", e=> handlePhoto(e.target.files && e.target.files[0]) ); }
-if(dropzone){
-  ["dragenter","dragover"].forEach(ev=> dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.classList.add("drag"); }));
-  ["dragleave","dragend"].forEach(ev=> dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.classList.remove("drag"); }));
-  dropzone.addEventListener("drop", e=>{ e.preventDefault(); dropzone.classList.remove("drag"); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; handlePhoto(f); });
-}
-const PHOTO_DEMOS = [
-  { productName:"Fresh Apple", brand:"Whole fruit", servingSize:"1 medium (182 g)", calories:95, sugar_g:19, addedSugar_g:0, sodium_mg:2, saturatedFat_g:0, fiber_g:4, protein_g:0.5, ingredients:["apple"], isUltraProcessed:false, healthScore:90, healthRating:"Good", healthConcerns:["Whole fruit — the fiber slows sugar absorption and keeps you full.","A good source of vitamin C and antioxidants that support your immune system."], healthierAlternatives:[{name:"Pair with a small handful of almonds", reason:"Adds protein and healthy fats to steady your energy."}] },
-  { productName:"Potato Chips", brand:"Snack aisle", servingSize:"1 bag (50 g)", calories:270, sugar_g:0.5, addedSugar_g:0, sodium_mg:320, saturatedFat_g:3, fiber_g:2, protein_g:3, ingredients:["potatoes","vegetable oil","salt"], isUltraProcessed:true, healthScore:32, healthRating:"Poor", healthConcerns:["Fried and salty — regular snacking is linked to higher blood pressure.","Calorie-dense and easy to overeat, with little to keep you full."], healthierAlternatives:[{name:"Air-popped popcorn", reason:"Whole grain and high in fiber for far fewer calories."},{name:"Roasted chickpeas", reason:"Crunchy, with protein and fiber instead of empty calories."}] },
-  { productName:"Grilled Chicken Salad", brand:"Home cooked", servingSize:"1 bowl (350 g)", calories:320, sugar_g:6, addedSugar_g:0, sodium_mg:380, saturatedFat_g:3, fiber_g:6, protein_g:34, ingredients:["chicken breast","mixed greens","tomato","olive oil","lemon"], isUltraProcessed:false, healthScore:86, healthRating:"Good", healthConcerns:["High in lean protein and fiber — filling and supports muscle.","Plenty of vegetables deliver vitamins with very little added sugar."], healthierAlternatives:[{name:"Dress with olive oil and lemon", reason:"Skips the hidden sugar and sodium in bottled dressings."}] }
+const FOODS = [
+  {id:"coke", name:"Coca-Cola", emoji:"🥤", category:"Drinks", brand:"Coca-Cola", servingSize:"1 can (330 ml)", calories:139, sugar_g:39, addedSugar_g:39, sodium_mg:15, saturatedFat_g:0, fiber_g:0, protein_g:0, ingredients:["Carbonated water","Sugar","Caramel color","Phosphoric acid","Natural flavors","Caffeine"], isUltraProcessed:true, healthScore:12, healthRating:"Poor",
+    healthConcerns:["A single can holds ~39 g of sugar — nearly 10 teaspoons, more than a full day's added-sugar limit.","Regular sugary drinks are strongly linked to weight gain, type-2 diabetes and tooth decay.","Empty calories: no fiber, protein or nutrients to keep you full."],
+    healthierAlternatives:[{name:"Sparkling water with lime",reason:"Same fizzy refreshment, zero sugar."},{name:"Unsweetened iced tea",reason:"Flavor and antioxidants without the sugar load."},{name:"Fruit-infused water",reason:"Naturally flavored hydration that keeps blood sugar steady."}]},
+  {id:"chips", name:"Potato Chips", emoji:"🥔", category:"Snacks", brand:"Snack aisle", servingSize:"1 small bag (50 g)", calories:270, sugar_g:0.5, addedSugar_g:0, sodium_mg:320, saturatedFat_g:3, fiber_g:2, protein_g:3, ingredients:["Potatoes","Vegetable oil","Salt"], isUltraProcessed:true, healthScore:30, healthRating:"Poor",
+    healthConcerns:["Fried and salty — frequent snacking is linked to higher blood pressure.","Calorie-dense and easy to overeat, with little to keep you full."],
+    healthierAlternatives:[{name:"Air-popped popcorn",reason:"Whole grain and high fiber for far fewer calories."},{name:"Roasted chickpeas",reason:"Crunchy, with protein and fiber instead of empty calories."}]},
+  {id:"ramen", name:"Instant Ramen", emoji:"🍜", category:"Meals", brand:"Instant", servingSize:"1 pack (85 g)", calories:380, sugar_g:2, addedSugar_g:0, sodium_mg:1500, saturatedFat_g:7, fiber_g:2, protein_g:8, ingredients:["Wheat flour","Palm oil","Salt","Seasoning (MSG)","Preservatives"], isUltraProcessed:true, healthScore:24, healthRating:"Poor",
+    healthConcerns:["One pack can hold ~65% of a full day's sodium.","Refined and fried, with little fiber or real nutrition."],
+    healthierAlternatives:[{name:"Whole-grain noodle bowl with veggies",reason:"Fiber and nutrients with far less sodium."},{name:"Miso soup with tofu",reason:"Warm and savory with real protein."}]},
+  {id:"flakes", name:"Frosted Flakes", emoji:"🥣", category:"Breakfast", brand:"Cereal", servingSize:"1 cup (41 g)", calories:150, sugar_g:14, addedSugar_g:12, sodium_mg:200, saturatedFat_g:0, fiber_g:1, protein_g:2, ingredients:["Milled corn","Sugar","Malt flavor","Salt"], isUltraProcessed:true, healthScore:28, healthRating:"Poor",
+    healthConcerns:["Mostly refined sugar and corn — a fast blood-sugar spike and crash.","Low fiber and protein, so hunger returns quickly."],
+    healthierAlternatives:[{name:"Rolled oats with berries",reason:"Whole-grain fiber that keeps you full for hours."},{name:"Plain Greek yogurt with fruit",reason:"High protein, no added sugar."}]},
+  {id:"nutella", name:"Nutella", emoji:"🍫", category:"Spreads", brand:"Ferrero", servingSize:"2 tbsp (37 g)", calories:200, sugar_g:21, addedSugar_g:21, sodium_mg:15, saturatedFat_g:6, fiber_g:1, protein_g:2, ingredients:["Sugar","Palm oil","Hazelnuts","Cocoa","Skim milk","Lecithin","Vanillin"], isUltraProcessed:true, healthScore:20, healthRating:"Poor",
+    healthConcerns:["More than half its weight is sugar and palm oil.","Marketed as breakfast, but nutritionally closer to dessert."],
+    healthierAlternatives:[{name:"Natural peanut or almond butter",reason:"Protein and healthy fats, far less sugar."},{name:"Mashed banana on toast",reason:"Naturally sweet with fiber and potassium."}]},
+  {id:"burger", name:"Fast-food Cheeseburger", emoji:"🍔", category:"Fast food", brand:"Fast food", servingSize:"1 burger (170 g)", calories:500, sugar_g:9, addedSugar_g:5, sodium_mg:1000, saturatedFat_g:12, fiber_g:2, protein_g:25, ingredients:["Beef patty","Bun","Cheese","Sauces","Pickles"], isUltraProcessed:true, healthScore:34, healthRating:"Poor",
+    healthConcerns:["High in saturated fat and sodium in a single sitting.","Refined bun and sauces pile on sugar and calories."],
+    healthierAlternatives:[{name:"Grilled chicken sandwich",reason:"Leaner protein with less saturated fat."},{name:"Lettuce-wrapped burger",reason:"Cuts refined carbs and calories."}]},
+  {id:"donut", name:"Glazed Doughnut", emoji:"🍩", category:"Snacks", brand:"Bakery", servingSize:"1 doughnut (60 g)", calories:260, sugar_g:12, addedSugar_g:12, sodium_mg:300, saturatedFat_g:6, fiber_g:1, protein_g:3, ingredients:["Enriched flour","Sugar","Oil","Glaze"], isUltraProcessed:true, healthScore:24, healthRating:"Poor",
+    healthConcerns:["Fried refined dough plus a sugar glaze — a double hit.","Saturated and trans fats from frying oils."],
+    healthierAlternatives:[{name:"Whole-grain banana muffin",reason:"Fiber and potassium with less sugar."},{name:"Greek yogurt with honey",reason:"Protein-rich and satisfying."}]},
+  {id:"energy", name:"Energy Drink", emoji:"⚡", category:"Drinks", brand:"Energy", servingSize:"1 can (473 ml)", calories:210, sugar_g:52, addedSugar_g:52, sodium_mg:200, saturatedFat_g:0, fiber_g:0, protein_g:0, ingredients:["Carbonated water","Sugar","Caffeine","Taurine","Additives"], isUltraProcessed:true, healthScore:10, healthRating:"Poor",
+    healthConcerns:["~52 g sugar plus a large caffeine dose — a spike then a crash.","Heavy use is linked to heart-rhythm and sleep problems."],
+    healthierAlternatives:[{name:"Black coffee",reason:"Caffeine with zero sugar."},{name:"Green tea",reason:"Gentler energy plus antioxidants."}]},
+  {id:"whitebread", name:"White Bread", emoji:"🍞", category:"Bakery", brand:"Bakery", servingSize:"2 slices (60 g)", calories:160, sugar_g:3, addedSugar_g:2, sodium_mg:320, saturatedFat_g:0, fiber_g:1, protein_g:5, ingredients:["Enriched wheat flour","Water","Sugar","Yeast","Salt"], isUltraProcessed:false, healthScore:45, healthRating:"Moderate",
+    healthConcerns:["Refined flour digests fast and offers little fiber.","Fine occasionally — go whole-grain most of the time."],
+    healthierAlternatives:[{name:"100% whole-wheat bread",reason:"More fiber and a slower blood-sugar rise."},{name:"Sprouted-grain bread",reason:"Extra nutrients and fiber."}]},
+  {id:"flavyog", name:"Flavored Yogurt", emoji:"🥛", category:"Dairy", brand:"Dairy", servingSize:"1 cup (170 g)", calories:150, sugar_g:19, addedSugar_g:12, sodium_mg:90, saturatedFat_g:2, fiber_g:0, protein_g:6, ingredients:["Milk","Sugar","Fruit prep","Thickeners"], isUltraProcessed:false, healthScore:52, healthRating:"Moderate",
+    healthConcerns:["Often carries as much added sugar as dessert.","Good protein, but the sweeteners undercut it."],
+    healthierAlternatives:[{name:"Plain Greek yogurt with fresh fruit",reason:"Same creaminess, no added sugar."},{name:"Cottage cheese with berries",reason:"High protein and naturally low sugar."}]},
+  {id:"granola", name:"Granola Bar", emoji:"🍫", category:"Snacks", brand:"Snack", servingSize:"1 bar (40 g)", calories:190, sugar_g:12, addedSugar_g:10, sodium_mg:105, saturatedFat_g:3, fiber_g:2, protein_g:3, ingredients:["Oats","Sugar/syrup","Oil","Chocolate chips"], isUltraProcessed:false, healthScore:50, healthRating:"Moderate",
+    healthConcerns:["Marketed as healthy but often carries candy-bar sugar levels.","Syrups add up fast — check the label."],
+    healthierAlternatives:[{name:"A handful of nuts",reason:"Filling fats and protein, no added sugar."},{name:"Plain oats with fruit",reason:"Whole-grain energy that lasts."}]},
+  {id:"oj", name:"Orange Juice", emoji:"🍊", category:"Drinks", brand:"Juice", servingSize:"1 cup (240 ml)", calories:110, sugar_g:21, addedSugar_g:0, sodium_mg:0, saturatedFat_g:0, fiber_g:0.5, protein_g:2, ingredients:["Orange juice"], isUltraProcessed:false, healthScore:55, healthRating:"Moderate",
+    healthConcerns:["Natural sugar, but juicing strips away whole fruit's fiber.","Easy to drink more sugar than you'd eat in whole oranges."],
+    healthierAlternatives:[{name:"A whole orange",reason:"Same vitamins, plus filling fiber."},{name:"Water with orange slices",reason:"Refreshing with a fraction of the sugar."}]},
+  {id:"apple", name:"Apple", emoji:"🍎", category:"Produce", brand:"Whole fruit", servingSize:"1 medium (182 g)", calories:95, sugar_g:19, addedSugar_g:0, sodium_mg:2, saturatedFat_g:0, fiber_g:4, protein_g:0.5, ingredients:["Apple"], isUltraProcessed:false, healthScore:90, healthRating:"Good",
+    healthConcerns:["Whole fruit — fiber slows sugar absorption and keeps you full.","Vitamin C and antioxidants that support your immune system."],
+    healthierAlternatives:[{name:"Pair with a handful of almonds",reason:"Adds protein and healthy fats for staying power."}]},
+  {id:"oats", name:"Rolled Oats", emoji:"🥣", category:"Breakfast", brand:"Whole grain", servingSize:"1/2 cup dry (40 g)", calories:150, sugar_g:1, addedSugar_g:0, sodium_mg:0, saturatedFat_g:0.5, fiber_g:4, protein_g:5, ingredients:["Whole-grain oats"], isUltraProcessed:false, healthScore:88, healthRating:"Good",
+    healthConcerns:["Whole grain with soluble fiber that supports heart health and steady energy.","Naturally low in sugar and sodium."],
+    healthierAlternatives:[{name:"Top with berries and nuts",reason:"Natural sweetness plus protein — skip the sugar."}]},
+  {id:"avocado", name:"Avocado", emoji:"🥑", category:"Produce", brand:"Whole food", servingSize:"1/2 avocado (68 g)", calories:114, sugar_g:0.4, addedSugar_g:0, sodium_mg:5, saturatedFat_g:1.5, fiber_g:5, protein_g:1.5, ingredients:["Avocado"], isUltraProcessed:false, healthScore:86, healthRating:"Good",
+    healthConcerns:["Heart-healthy monounsaturated fats plus plenty of fiber.","Calorie-dense, so keep an eye on portions."],
+    healthierAlternatives:[{name:"Use it in place of butter or mayo",reason:"Swaps saturated fat for healthy fat."}]},
+  {id:"chicken", name:"Grilled Chicken Breast", emoji:"🍗", category:"Protein", brand:"Home cooked", servingSize:"1 breast (120 g)", calories:190, sugar_g:0, addedSugar_g:0, sodium_mg:80, saturatedFat_g:1, fiber_g:0, protein_g:36, ingredients:["Chicken breast"], isUltraProcessed:false, healthScore:84, healthRating:"Good",
+    healthConcerns:["Lean, high-quality protein that supports muscle and keeps you full.","Very low in sugar and saturated fat."],
+    healthierAlternatives:[{name:"Grill or bake instead of frying",reason:"Keeps it lean without added oils."}]},
+  {id:"salmon", name:"Salmon", emoji:"🐟", category:"Protein", brand:"Whole food", servingSize:"1 fillet (120 g)", calories:210, sugar_g:0, addedSugar_g:0, sodium_mg:60, saturatedFat_g:3, fiber_g:0, protein_g:23, ingredients:["Salmon"], isUltraProcessed:false, healthScore:90, healthRating:"Good",
+    healthConcerns:["Rich in omega-3 fats linked to heart and brain health.","High-quality protein with minimal processing."],
+    healthierAlternatives:[{name:"Aim for two servings of fatty fish a week",reason:"Steady omega-3s without supplements."}]},
+  {id:"broccoli", name:"Broccoli", emoji:"🥦", category:"Produce", brand:"Whole food", servingSize:"1 cup (91 g)", calories:31, sugar_g:1.5, addedSugar_g:0, sodium_mg:30, saturatedFat_g:0, fiber_g:2.4, protein_g:2.5, ingredients:["Broccoli"], isUltraProcessed:false, healthScore:95, healthRating:"Good",
+    healthConcerns:["Very low calorie, high in fiber, vitamin C and vitamin K.","Fills you up and supports healthy digestion."],
+    healthierAlternatives:[{name:"Roast with a little olive oil",reason:"Boosts flavor while keeping it nutritious."}]},
+  {id:"almonds", name:"Almonds", emoji:"🌰", category:"Snacks", brand:"Whole food", servingSize:"1 oz (28 g)", calories:164, sugar_g:1, addedSugar_g:0, sodium_mg:0, saturatedFat_g:1, fiber_g:3.5, protein_g:6, ingredients:["Almonds"], isUltraProcessed:false, healthScore:85, healthRating:"Good",
+    healthConcerns:["Healthy fats, fiber and protein make them very filling.","Calorie-dense — a small handful is a portion."],
+    healthierAlternatives:[{name:"Choose unsalted, dry-roasted",reason:"Skips the extra sodium."}]},
+  {id:"greekyog", name:"Plain Greek Yogurt", emoji:"🥛", category:"Dairy", brand:"Dairy", servingSize:"1 cup (170 g)", calories:100, sugar_g:6, addedSugar_g:0, sodium_mg:60, saturatedFat_g:0.5, fiber_g:0, protein_g:17, ingredients:["Cultured milk"], isUltraProcessed:false, healthScore:84, healthRating:"Good",
+    healthConcerns:["High protein and probiotics with no added sugar.","Add fruit for natural sweetness instead of flavored versions."],
+    healthierAlternatives:[{name:"Top with berries and a drizzle of honey",reason:"Natural sweetness plus antioxidants."}]}
 ];
+const POPULAR = ["coke","chips","flakes","apple","oats","avocado","salmon","almonds"];
+
+const searchEl = $("#search"), matchesEl = $("#matches"), chipsEl = $("#chips");
+POPULAR.forEach(id=>{ const f=FOODS.find(x=>x.id===id); if(!f) return;
+  const b=document.createElement("button"); b.className="chip"; b.innerHTML='<span>'+f.emoji+'</span>'+esc(f.name);
+  b.addEventListener("click",()=>{ searchEl.value=""; matchesEl.className="matches"; showFood(f,"db"); }); chipsEl.appendChild(b);
+});
+function ratingClass(r){ return r==="Good"?"b-good":r==="Poor"?"b-poor":"b-mod"; }
+searchEl.addEventListener("input", ()=>{
+  const q = searchEl.value.trim().toLowerCase();
+  if(!q){ matchesEl.className="matches"; matchesEl.innerHTML=""; return; }
+  const res = FOODS.filter(f=> f.name.toLowerCase().includes(q) || f.category.toLowerCase().includes(q)).slice(0,8);
+  matchesEl.innerHTML = res.length ? res.map(f=>(
+    '<button class="match" data-id="'+f.id+'"><span class="em">'+f.emoji+'</span>'+
+    '<span><span class="nm">'+esc(f.name)+'</span><br/><span class="cat">'+esc(f.category)+'</span></span>'+
+    '<span class="badge '+ratingClass(f.healthRating)+'">'+f.healthRating+'</span></button>'
+  )).join("") : '<div style="padding:10px 12px;color:#64748b;font-size:14px">No match in our starter database yet — try Coca-Cola, oats, salmon, or use the Advanced live scrape below.</div>';
+  matchesEl.className = "matches show";
+  matchesEl.querySelectorAll(".match").forEach(m=> m.addEventListener("click",()=>{
+    const f=FOODS.find(x=>x.id===m.dataset.id); searchEl.value=""; matchesEl.className="matches"; showFood(f,"db");
+  }));
+});
+function showFood(f, source){ clearStatus(); lastRequest=null; render(f, null, {source:source||"db"}); }
+
+const dropzone=$("#dropzone"), photoInput=$("#photo"), dzBody=$("#dzBody");
+photoInput.addEventListener("change", e=> handlePhoto(e.target.files && e.target.files[0]));
+["dragenter","dragover"].forEach(ev=> dropzone.addEventListener(ev,e=>{e.preventDefault();dropzone.classList.add("drag");}));
+["dragleave","dragend"].forEach(ev=> dropzone.addEventListener(ev,e=>{e.preventDefault();dropzone.classList.remove("drag");}));
+dropzone.addEventListener("drop", e=>{ e.preventDefault(); dropzone.classList.remove("drag"); handlePhoto(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]); });
 function handlePhoto(file){
-  if(!file || !/^image\//.test(file.type || "")) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const src = ev.target.result;
-    dzBody.className = "dz-body";
-    dzBody.innerHTML = '<div class="dz-ico">🔎</div><b>Scanning your photo…</b><span>Reading the food and estimating nutrition</span>';
+  if(!file || !/^image\//.test(file.type||"")) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const src=ev.target.result;
+    dzBody.className="dz-body"; dzBody.innerHTML='<div class="dz-ico">🔎</div><b>Scanning your photo…</b><span>Reading the food and estimating nutrition</span>';
     setTimeout(function(){
-      const demo = PHOTO_DEMOS[Math.floor(Math.random()*PHOTO_DEMOS.length)];
-      dzBody.className = "dz-body scan-row";
-      dzBody.innerHTML = '<img class="dz-thumb" src="'+src+'" alt="scanned food"/><div><b>Scanned ✓</b><br/><span>Detected: '+esc(demo.productName)+' · drop another photo to rescan</span></div>';
-      clearStatus();
-      lastRequest = null;
-      render(demo, null, {showRaw:false});
-    }, 1200);
+      const pick=FOODS[Math.floor(Math.random()*FOODS.length)];
+      dzBody.className="dz-body scan-row";
+      dzBody.innerHTML='<img class="dz-thumb" src="'+src+'" alt="scanned food"/><div><b>Scanned ✓</b><br/><span>Detected: '+esc(pick.name)+' · drop another photo to rescan</span></div>';
+      showFood(pick,"photo");
+    },1200);
   };
   reader.readAsDataURL(file);
 }
 
-async function runAnalysis(){
-  const key = $("#key").value.trim();
-  const url = $("#url").value.trim();
-  resultsEl.className = "results";
-  if(!url){ setStatus("err","⚠️ Paste a food or product URL first."); return; }
+const FC_ENDPOINT="https://api.firecrawl.dev/v2/scrape";
+const NUTRI_SCHEMA={type:"object",properties:{productName:{type:"string"},brand:{type:"string"},servingSize:{type:"string"},calories:{type:"number"},sugar_g:{type:"number"},addedSugar_g:{type:"number"},sodium_mg:{type:"number"},saturatedFat_g:{type:"number"},fiber_g:{type:"number"},protein_g:{type:"number"},ingredients:{type:"array",items:{type:"string"}},isUltraProcessed:{type:"boolean"},healthScore:{type:"number"},healthRating:{type:"string",enum:["Good","Moderate","Poor"]},healthConcerns:{type:"array",items:{type:"string"}},healthierAlternatives:{type:"array",items:{type:"object",properties:{name:{type:"string"},reason:{type:"string"}}}}},required:["productName","healthRating","healthConcerns","healthierAlternatives"]};
+const EXTRACT_PROMPT="You are a registered-dietitian-style nutrition analyst. From this food or grocery product page, extract nutrition facts and the ingredient list. Then judge how healthy it is to eat regularly, give a 0-100 healthScore and a healthRating of Good/Moderate/Poor, explain the main effects on the body in plain language (healthConcerns), and suggest 3 healthier real-food alternatives (healthierAlternatives, each with a short reason). Base everything only on what the page supports.";
+let lastRequest=null;
+function fcBody(url){ return {url:url,onlyMainContent:true,formats:["markdown",{type:"json",prompt:EXTRACT_PROMPT,schema:NUTRI_SCHEMA}]}; }
+$("#ex").addEventListener("click",()=> $("#url").value="https://world.openfoodfacts.org/product/5449000000996/coca-cola");
+$("#go").addEventListener("click", async ()=>{
+  const key=$("#key").value.trim(), url=$("#url").value.trim();
+  $("#results").className="results";
+  if(!url){ setStatus("err","⚠️ Paste a product URL first."); return; }
   if(!key){ setStatus("err","⚠️ Enter your Firecrawl API key (starts with <code>fc-</code>)."); return; }
-
-  const body = buildRequestBody(url);
-  lastRequest = { endpoint: FC_ENDPOINT, method:"POST",
-    headers:{ "Authorization":"Bearer fc-••••••••", "Content-Type":"application/json" }, body };
-
-  $("#go").disabled = true;
-  setStatus("load","Scraping the page with Firecrawl and extracting nutrition…");
+  lastRequest={endpoint:FC_ENDPOINT,method:"POST",headers:{Authorization:"Bearer fc-••••••••","Content-Type":"application/json"},body:fcBody(url)};
+  $("#go").disabled=true; setStatus("load","Scraping the page with Firecrawl and extracting nutrition…");
   try{
-    const res = await fetch(FC_ENDPOINT, {
-      method:"POST",
-      headers:{ "Authorization":"Bearer "+key, "Content-Type":"application/json" },
-      body: JSON.stringify(body)
-    });
-    const data = await res.json();
-    lastResponse = data;
-    if(!res.ok || data.success === false){
-      throw new Error((data && data.error) ? data.error : ("HTTP "+res.status));
-    }
-    const extracted = data.data && data.data.json;
-    if(!extracted){ throw new Error("Firecrawl returned no structured JSON for this page."); }
-    clearStatus();
-    render(extracted, data);
-  }catch(err){
-    setStatus("err","❌ "+ (err.message||err) +
-      '<br/><span style="font-size:12.5px">If this is a network/CORS block, use <a style="color:#991b1b;font-weight:700" id="trysample">Load sample analysis</a> to preview the output.</span>');
-    const ts = document.getElementById("trysample");
-    if(ts) ts.addEventListener("click", loadSample);
-  }finally{
-    $("#go").disabled = false;
-  }
-}
+    const res=await fetch(FC_ENDPOINT,{method:"POST",headers:{Authorization:"Bearer "+key,"Content-Type":"application/json"},body:JSON.stringify(fcBody(url))});
+    const data=await res.json();
+    if(!res.ok||data.success===false) throw new Error((data&&data.error)?data.error:("HTTP "+res.status));
+    const ex=data.data&&data.data.json; if(!ex) throw new Error("Firecrawl returned no structured JSON for this page.");
+    clearStatus(); render(ex,data,{source:"firecrawl"});
+  }catch(err){ setStatus("err","❌ "+(err.message||err)); }
+  finally{ $("#go").disabled=false; }
+});
 
-// ---------- rendering ----------
-function num(v,suffix=""){ return (v===null||v===undefined||v==="") ? "—" : v+suffix; }
+const statusEl=$("#status"), resultsEl=$("#results");
+function setStatus(kind,html){ statusEl.className="status show "+kind; statusEl.innerHTML=html; }
+function clearStatus(){ statusEl.className="status"; statusEl.innerHTML=""; }
+function num(v,suf=""){ return (v===null||v===undefined||v==="")?"—":v+suf; }
+function esc(s){ return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
 
 function render(x, raw, opts){
-  opts = opts || {};
-  const rating = (x.healthRating||"Moderate");
-  const score = (typeof x.healthScore==="number") ? Math.round(x.healthScore)
-              : (rating==="Good"?78:rating==="Poor"?24:52);
-  const cls = rating==="Good"?"v-good":rating==="Poor"?"v-poor":"v-mod";
-  const blurb = rating==="Good"?"A solid everyday choice.":rating==="Poor"?"Best kept to an occasional treat.":"Okay sometimes — watch the portions.";
-
-  const concerns = (x.healthConcerns||[]).map(c=>
-    `<div class="concern"><span class="ic">⚠️</span><span>${esc(c)}</span></div>`).join("") || '<p style="color:#64748b;font-size:14px">No major concerns flagged.</p>';
-
-  const swaps = (x.healthierAlternatives||[]).map(s=>{
-    const name = typeof s==="string"? s : (s.name||"");
-    const reason = typeof s==="string"? "" : (s.reason||"");
-    return `<div class="swap"><span class="em">🥗</span><div><b>${esc(name)}</b><p>${esc(reason)}</p></div></div>`;
-  }).join("") || '<p style="color:#64748b;font-size:14px">—</p>';
-
-  const flags = [];
+  opts=opts||{}; const source=opts.source||"db";
+  const rating=x.healthRating||"Moderate";
+  const score=(typeof x.healthScore==="number")?Math.round(x.healthScore):(rating==="Good"?78:rating==="Poor"?24:52);
+  const cls=rating==="Good"?"v-good":rating==="Poor"?"v-poor":"v-mod";
+  const blurb=rating==="Good"?"A solid everyday choice.":rating==="Poor"?"Best kept to an occasional treat.":"Okay sometimes — watch the portions.";
+  const emoji=x.emoji?x.emoji+" ":"";
+  const concerns=(x.healthConcerns||[]).map(c=>'<div class="concern"><span class="ic">⚠️</span><span>'+esc(c)+'</span></div>').join("")||'<p style="color:#64748b;font-size:14px">No major concerns flagged.</p>';
+  const swaps=(x.healthierAlternatives||[]).map(s=>{const n=typeof s==="string"?s:(s.name||"");const r=typeof s==="string"?"":(s.reason||"");return '<div class="swap"><span class="em">🥗</span><div><b>'+esc(n)+'</b><p>'+esc(r)+'</p></div></div>';}).join("")||'<p style="color:#64748b;font-size:14px">—</p>';
+  const flags=[];
   if(x.isUltraProcessed) flags.push('<span class="tag bad">Ultra-processed</span>');
-  if(x.addedSugar_g>10 || x.sugar_g>15) flags.push('<span class="tag warn">High sugar</span>');
+  if(x.addedSugar_g>10||x.sugar_g>15) flags.push('<span class="tag warn">High sugar</span>');
   if(x.sodium_mg>400) flags.push('<span class="tag warn">High sodium</span>');
   if(x.saturatedFat_g>5) flags.push('<span class="tag warn">High saturated fat</span>');
   if(x.fiber_g>=3) flags.push('<span class="tag ok">Good fiber</span>');
   if(x.protein_g>=8) flags.push('<span class="tag ok">Good protein</span>');
-
-  resultsEl.innerHTML = `
-    <div class="verdict ${cls}">
-      <div class="score">${score}</div>
-      <div>
-        <h3>${esc(x.productName||"Food")} ${x.brand?('· '+esc(x.brand)):''} — ${esc(rating)}</h3>
-        <p>${blurb} ${flags.length?'<br/>'+flags.join(' '):''}</p>
-      </div>
-    </div>
-    <div class="grid2">
-      <div class="panel">
-        <h4>Nutrition · per ${esc(x.servingSize||"serving")}</h4>
-        <div class="kv"><span class="k">Calories</span><span class="v">${num(x.calories)}</span></div>
-        <div class="kv"><span class="k">Total sugar</span><span class="v">${num(x.sugar_g,"g")}</span></div>
-        <div class="kv"><span class="k">Added sugar</span><span class="v">${num(x.addedSugar_g,"g")}</span></div>
-        <div class="kv"><span class="k">Sodium</span><span class="v">${num(x.sodium_mg,"mg")}</span></div>
-        <div class="kv"><span class="k">Saturated fat</span><span class="v">${num(x.saturatedFat_g,"g")}</span></div>
-        <div class="kv"><span class="k">Fiber</span><span class="v">${num(x.fiber_g,"g")}</span></div>
-        <div class="kv"><span class="k">Protein</span><span class="v">${num(x.protein_g,"g")}</span></div>
-      </div>
-      <div class="panel">
-        <h4>What it does to your body</h4>
-        ${concerns}
-      </div>
-      <div class="panel fullw">
-        <h4>Ingredients (as listed)</h4>
-        <p style="font-size:13.5px;color:#334155">${(x.ingredients&&x.ingredients.length)?esc(x.ingredients.join(", ")):"—"}</p>
-      </div>
-      <div class="panel fullw">
-        <h4>Better swaps 🍏</h4>
-        ${swaps}
-      </div>
-    </div>
-    ${opts.showRaw===false ? '<div class="protonote">🔬 Prototype photo scan — this is a sample health read to show the experience. On-device recognition of the food in your photo is coming soon.</div>' : rawBlock(raw)}
-  `;
-  resultsEl.className = "results show";
-  wireRaw();
-  resultsEl.scrollIntoView({behavior:"smooth", block:"start"});
+  let tail;
+  if(source==="firecrawl") tail=rawBlock(raw);
+  else if(source==="photo") tail='<div class="protonote">🔬 Prototype photo scan — NutriLens showed a health read from our food database to demonstrate the experience. On-device recognition of the exact food in your photo is coming soon.</div>';
+  else tail='<div class="srcnote">✅ Health read from the NutriLens food database — an educational estimate for a typical serving.</div>';
+  resultsEl.innerHTML=
+    '<div class="verdict '+cls+'"><div class="score">'+score+'</div><div>'+
+    '<h3>'+emoji+esc(x.productName||x.name||"Food")+(x.brand?' · '+esc(x.brand):'')+' — '+esc(rating)+'</h3>'+
+    '<p>'+blurb+(flags.length?'<br/>'+flags.join(' '):'')+'</p></div></div>'+
+    '<div class="grid2">'+
+      '<div class="panel"><h4>Nutrition · per '+esc(x.servingSize||"serving")+'</h4>'+
+      '<div class="kv"><span class="k">Calories</span><span class="v">'+num(x.calories)+'</span></div>'+
+      '<div class="kv"><span class="k">Total sugar</span><span class="v">'+num(x.sugar_g,"g")+'</span></div>'+
+      '<div class="kv"><span class="k">Added sugar</span><span class="v">'+num(x.addedSugar_g,"g")+'</span></div>'+
+      '<div class="kv"><span class="k">Sodium</span><span class="v">'+num(x.sodium_mg,"mg")+'</span></div>'+
+      '<div class="kv"><span class="k">Saturated fat</span><span class="v">'+num(x.saturatedFat_g,"g")+'</span></div>'+
+      '<div class="kv"><span class="k">Fiber</span><span class="v">'+num(x.fiber_g,"g")+'</span></div>'+
+      '<div class="kv"><span class="k">Protein</span><span class="v">'+num(x.protein_g,"g")+'</span></div></div>'+
+      '<div class="panel"><h4>What it does to your body</h4>'+concerns+'</div>'+
+      '<div class="panel fullw"><h4>Ingredients</h4><p style="font-size:13.5px;color:#334155">'+((x.ingredients&&x.ingredients.length)?esc(x.ingredients.join(", ")):"—")+'</p></div>'+
+      '<div class="panel fullw"><h4>Better swaps 🍏</h4>'+swaps+'</div>'+
+    '</div>'+tail;
+  resultsEl.className="results show";
+  if(source==="firecrawl") wireRaw();
+  resultsEl.scrollIntoView({behavior:"smooth",block:"nearest"});
 }
-
 function rawBlock(raw){
-  const reqStr = JSON.stringify(lastRequest, null, 2);
-  const md = raw && raw.data && raw.data.markdown ? raw.data.markdown : "(markdown not returned)";
-  const jsonStr = raw && raw.data && raw.data.json ? JSON.stringify(raw.data.json, null, 2) : "{}";
-  return `
-  <details class="raw" open>
-    <summary><span class="lbl">🔧 Firecrawl request &amp; response — proof of work</span><span style="font-size:11px;color:#94a3b8">click to toggle</span></summary>
-    <div class="rawtabs">
-      <div class="rawtab active" data-t="req">Request</div>
-      <div class="rawtab" data-t="json">Extracted JSON</div>
-      <div class="rawtab" data-t="md">Scraped markdown</div>
-    </div>
-    <pre data-p="req">${esc(reqStr)}</pre>
-    <pre data-p="json" style="display:none">${esc(jsonStr)}</pre>
-    <pre data-p="md" style="display:none">${esc(String(md).slice(0,6000))}</pre>
-  </details>`;
+  const reqStr=JSON.stringify(lastRequest,null,2);
+  const md=raw&&raw.data&&raw.data.markdown?raw.data.markdown:"(markdown not returned)";
+  const jsonStr=raw&&raw.data&&raw.data.json?JSON.stringify(raw.data.json,null,2):"{}";
+  return '<details class="raw" open><summary><span>🔧 Firecrawl request &amp; response</span><span style="font-size:11px;color:#94a3b8">click to toggle</span></summary>'+
+    '<div class="rawtabs"><div class="rawtab active" data-t="req">Request</div><div class="rawtab" data-t="json">Extracted JSON</div><div class="rawtab" data-t="md">Scraped markdown</div></div>'+
+    '<pre data-p="req">'+esc(reqStr)+'</pre>'+
+    '<pre data-p="json" style="display:none">'+esc(jsonStr)+'</pre>'+
+    '<pre data-p="md" style="display:none">'+esc(String(md).slice(0,6000))+'</pre></details>';
 }
-function wireRaw(){
-  document.querySelectorAll(".rawtab").forEach(t=>{
-    t.addEventListener("click",()=>{
-      document.querySelectorAll(".rawtab").forEach(x=>x.classList.remove("active"));
-      t.classList.add("active");
-      document.querySelectorAll("details.raw pre").forEach(p=>p.style.display="none");
-      document.querySelector('pre[data-p="'+t.dataset.t+'"]').style.display="block";
-    });
-  });
-}
-function esc(s){ return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
-
-// ---------- sample fallback (real Firecrawl-shaped response) ----------
-// This is a REAL response captured live from Firecrawl v2 (Coca-Cola, Open Food Facts).
-const SAMPLE = {
-  success:true,
-  data:{
-    markdown:"# coca-cola – 33 cl\n\n**Nutri-Score: E**  ·  NOVA 4 (ultra-processed)\n\n## Nutrition facts — per 100 ml\n\n| Nutrient | Amount |\n| --- | --- |\n| Energy | 180 kJ / 42 kcal |\n| Sugars | 10.6 g |\n| Fat | 0 g |\n| Salt | ~0 g |\n\n### Negative points: 12/54\n- **Energy** 3/10 points (180 kJ)\n- **Sugars** — high\n\n## Ingredients\nCarbonated water, sugar, colour (caramel e150d), acid (phosphoric acid), natural flavourings, caffeine flavouring.\n\n_Source: Open Food Facts — scraped via Firecrawl v2/scrape_",
-    json:{
-      productName:"Coca-Cola", brand:"Coca-Cola", servingSize:"330 ml",
-      calories:42, sugar_g:10.6, addedSugar_g:10.6, sodium_mg:0, saturatedFat_g:0, fiber_g:0, protein_g:0,
-      ingredients:["carbonated water","sugar","colour (caramel e150d)","acid (phosphoric acid)","natural flavourings","caffeine flavouring"],
-      isUltraProcessed:true, healthScore:12, healthRating:"Poor",
-      healthConcerns:[
-        "High sugar content can lead to weight gain and obesity.",
-        "Increased risk of type 2 diabetes and cardiovascular diseases due to high sugar consumption.",
-        "May contribute to dental problems like tooth decay."
-      ],
-      healthierAlternatives:[
-        {name:"Sparkling water with lemon", reason:"Provides hydration without added sugars."},
-        {name:"Unsweetened iced tea", reason:"A refreshing drink with no sugar."},
-        {name:"Fresh fruit juice (without added sugars)", reason:"Natural sugars and additional nutrients compared to soda."}
-      ]
-    },
-    metadata:{ title:"coca-cola – 33 cl", sourceURL:"https://world.openfoodfacts.org/product/5449000000996/coca-cola", statusCode:200 }
-  }
-};
-function loadSample(){
-  clearStatus();
-  lastRequest = { endpoint: FC_ENDPOINT, method:"POST",
-    headers:{ "Authorization":"Bearer fc-••••••••", "Content-Type":"application/json" },
-    body: buildRequestBody("https://world.openfoodfacts.org/product/5449000000996/coca-cola") };
-  render(SAMPLE.data.json, SAMPLE);
-}
+function wireRaw(){ document.querySelectorAll(".rawtab").forEach(t=> t.addEventListener("click",()=>{
+  document.querySelectorAll(".rawtab").forEach(x=>x.classList.remove("active")); t.classList.add("active");
+  document.querySelectorAll("details.raw pre").forEach(p=>p.style.display="none");
+  document.querySelector('pre[data-p="'+t.dataset.t+'"]').style.display="block";
+})); }
 </script>
 </body>
 </html>
